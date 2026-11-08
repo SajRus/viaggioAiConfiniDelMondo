@@ -12,13 +12,23 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: progetto
+            project_dir: ./
+          - name: poc1-chunk
+            project_dir: ./poc/poc1_chunk/
     steps:
       - uses: actions/checkout@v7
       - uses: godot-gdunit-labs/gdUnit4-action@v1.4.2
         with:
           godot-version: '4.7'
           version: installed
+          project_dir: ${{ matrix.project_dir }}
           paths: res://test
+          report-name: report-${{ matrix.name }}.xml
           headless: true
           # gdUnit4 6.x rifiuta l'headless senza questa opzione.
           arguments: --ignoreHeadlessMode
