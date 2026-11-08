@@ -214,7 +214,7 @@ Il rischio principale è la velocità di GDScript nel meshing: per questo i PoC 
 
 ### Decisioni aperte
 
-- [ ] Dimensione finale del mondo, dopo il PoC 2
+- [x] Dimensione finale del mondo: 16 × 16 chunk, confermata dopo il PoC 2
 
 ## Fonti
 
