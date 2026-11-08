@@ -1,0 +1,8 @@
+# Cache dell'editor Godot. I file .uid invece vanno committati.
+.godot/
+
+# Report generati da gdUnit4
+reports/
+
+# macOS
+.DS_Store
