@@ -61,7 +61,3 @@ gdscript/warnings/function_used_as_property=2
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")
-
-[rendering]
-
-renderer/rendering_method="forward_plus"

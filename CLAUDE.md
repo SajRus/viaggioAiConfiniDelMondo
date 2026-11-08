@@ -31,6 +31,7 @@ Sandbox voxel 3D in prima persona, con mondo finito. Godot 4.7, GDScript, render
 | `assets/textures/` | Texture |
 | `docs/` | Analisi e progettazione |
 | `addons/gdUnit4/` | gdUnit4 6.2.3, non modificare |
+| `poc/` | Un progetto Godot separato per ogni PoC. `poc/.gdignore` lo nasconde al progetto principale |
 
 I file `.uid` si committano, sempre insieme al file a cui si riferiscono. `.godot/` non si committa.
 
