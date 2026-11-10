@@ -24,6 +24,8 @@ jobs:
             project_dir: ./poc/poc2_world/
           - name: poc3-movement
             project_dir: ./poc/poc3_movement/
+          - name: poc4-editing
+            project_dir: ./poc/poc4_editing/
     steps:
       - uses: actions/checkout@v7
       - uses: godot-gdunit-labs/gdUnit4-action@v1.4.2

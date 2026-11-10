@@ -1,0 +1,59 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/main.gd" id="1_main"]
+[ext_resource type="Texture2D" path="res://assets/atlas.png" id="2_atlas"]
+[ext_resource type="PackedScene" path="res://player.tscn" id="3_player"]
+
+[sub_resource type="StandardMaterial3D" id="Material_atlas"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+albedo_texture = ExtResource("2_atlas")
+roughness = 1.0
+texture_filter = 0
+
+[sub_resource type="ProceduralSkyMaterial" id="Sky_material"]
+
+[sub_resource type="Sky" id="Sky_day"]
+sky_material = SubResource("Sky_material")
+
+[sub_resource type="Environment" id="Environment_day"]
+background_mode = 2
+sky = SubResource("Sky_day")
+ambient_light_source = 3
+reflected_light_source = 1
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_main")
+_material = SubResource("Material_atlas")
+
+[node name="Chunks" type="Node3D" parent="."]
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8, -0.36, 0.48, 0, 0.8, 0.6, -0.6, -0.48, 0.64, 0, 60, 0)
+shadow_enabled = true
+
+[node name="Environment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_day")
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+
+[node name="Hud" type="CanvasLayer" parent="."]
+
+[node name="Crosshair" type="ColorRect" parent="Hud"]
+mouse_filter = 2
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 2.0
+offset_bottom = 2.0
+color = Color(1, 1, 1, 0.85)
+
+[node name="Stats" type="Label" parent="Hud"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 900.0
+offset_bottom = 60.0
