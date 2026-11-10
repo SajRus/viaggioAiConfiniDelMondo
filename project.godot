@@ -11,7 +11,13 @@ config_version=5
 [application]
 
 config/name="Viaggio ai confini del mondo"
+run/main_scene="res://src/ui/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
+
+[autoload]
+
+BlockRegistry="*res://src/world/block_table.gd"
+SaveSystem="*res://src/save/save_system.gd"
 
 [debug]
 
@@ -61,3 +67,7 @@ gdscript/warnings/function_used_as_property=2
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
