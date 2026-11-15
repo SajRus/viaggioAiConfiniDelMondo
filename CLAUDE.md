@@ -20,14 +20,15 @@ Sandbox voxel 3D in prima persona, con mondo finito. Godot 4.7, GDScript, render
 - `:=` solo quando il tipo è evidente dal lato destro. Con valori `Variant` dichiara il tipo in modo esplicito.
 - I warning GDScript sono errori (`project.godot`, sezione `[debug]`). `addons/` è escluso.
 - Niente `@warning_ignore` senza un commento che spieghi il motivo. Per la divisione intera, dove è voluta, preferisci gli shift (`x >> 4`) se il divisore è una potenza di 2.
+- I controlli dell'HUD devono avere `mouse_filter` su Ignore: a mouse catturato il puntatore resta al centro dello schermo e un controllo lì sotto si prende movimenti e clic.
 - I dati stanno in `PackedByteArray` e array impacchettati. Il meshing è il rischio principale: niente allocazioni evitabili nei cicli caldi.
 
 ## Struttura
 
 | Cartella | Contenuto |
 | --- | --- |
-| `src/` | Codice del gioco |
-| `test/` | Test gdUnit4, stessa struttura di `src/`, file `*_test.gd` |
+| `src/` | Codice del gioco: `world/`, `player/`, `save/`, `ui/` |
+| `test/` | Test gdUnit4, stessa struttura di `src/`, file `*_test.gd`. `test/support/` contiene gli strumenti di verifica |
 | `assets/textures/` | Texture |
 | `docs/` | Analisi e progettazione |
 | `addons/gdUnit4/` | gdUnit4 6.2.3, non modificare |

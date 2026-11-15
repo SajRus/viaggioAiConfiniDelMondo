@@ -1,0 +1,22 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/player/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://src/player/block_interaction.gd" id="2_interaction"]
+
+[sub_resource type="BoxShape3D" id="Box_player"]
+size = Vector3(0.6, 1.8, 0.6)
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_player")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("Box_player")
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.62, 0)
+
+[node name="Camera" type="Camera3D" parent="Head"]
+
+[node name="Interaction" type="Node" parent="."]
+script = ExtResource("2_interaction")

@@ -1,0 +1,88 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/game.gd" id="1_main"]
+[ext_resource type="Script" path="res://src/world/world.gd" id="2_world"]
+[ext_resource type="Script" path="res://src/ui/hotbar_view.gd" id="3_hotbar"]
+[ext_resource type="Texture2D" path="res://assets/textures/atlas.png" id="4_atlas"]
+[ext_resource type="PackedScene" path="res://src/player/player.tscn" id="5_player"]
+[ext_resource type="PackedScene" path="res://src/ui/pause_menu.tscn" id="6_pause"]
+
+[sub_resource type="StandardMaterial3D" id="Material_atlas"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+albedo_texture = ExtResource("4_atlas")
+roughness = 1.0
+texture_filter = 0
+
+[sub_resource type="ProceduralSkyMaterial" id="Sky_material"]
+
+[sub_resource type="Sky" id="Sky_day"]
+sky_material = SubResource("Sky_material")
+
+[sub_resource type="Environment" id="Environment_day"]
+background_mode = 2
+sky = SubResource("Sky_day")
+ambient_light_source = 3
+reflected_light_source = 1
+
+[node name="Game" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="World" type="Node3D" parent="."]
+script = ExtResource("2_world")
+chunk_material = SubResource("Material_atlas")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8, -0.36, 0.48, 0, 0.8, 0.6, -0.6, -0.48, 0.64, 0, 60, 0)
+shadow_enabled = true
+
+[node name="Environment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_day")
+
+[node name="Player" parent="." instance=ExtResource("5_player")]
+
+[node name="Hud" type="CanvasLayer" parent="."]
+
+[node name="Crosshair" type="ColorRect" parent="Hud"]
+mouse_filter = 2
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 2.0
+offset_bottom = 2.0
+color = Color(1, 1, 1, 0.85)
+
+[node name="Hotbar" type="HBoxContainer" parent="Hud"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_top = -72.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("3_hotbar")
+atlas = ExtResource("4_atlas")
+
+[node name="Loading" type="Label" parent="Hud"]
+mouse_filter = 2
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -40.0
+offset_right = 200.0
+offset_bottom = -10.0
+horizontal_alignment = 1
+
+[node name="PauseLayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="Pause" parent="PauseLayer" instance=ExtResource("6_pause")]
