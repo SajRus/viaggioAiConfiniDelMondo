@@ -44,15 +44,32 @@ func set_block(x: int, y: int, z: int, id: int) -> bool:
 	return true
 
 
-## Rebuilds every marked chunk and returns their indices.
+## Rebuilds every marked chunk and returns their indices. The block scan is
+## split into layer ranges that run in parallel on worker threads, then each
+## chunk turns its faces into surfaces, also in parallel. Mesh and collision
+## are created here on the main thread, so the edit shows in this frame.
 func flush() -> PackedInt32Array:
 	var rebuilt: PackedInt32Array = _dirty_indices
 	_dirty_indices = PackedInt32Array()
+	if rebuilt.is_empty():
+		return rebuilt
+	var jobs: Array[MeshingJob] = []
+	var slices: Array[ScanSlice] = []
 	for index: int in rebuilt:
-		var chunk: ChunkData = _world.chunks[index]
-		_nodes[index].rebuild(_mesher, chunk)
-		chunk.dirty = false
+		var job: MeshingJob = MeshingJob.new(_world.chunks[index], _mesher.top_layer(_world.chunks[index]) + 1)
+		jobs.append(job)
+		slices.append_array(job.slices)
+	_run_on_workers(func(slice: int) -> void: slices[slice].run(_mesher), slices.size())
+	_run_on_workers(func(job: int) -> void: jobs[job].finish(_mesher), jobs.size())
+	for job: int in jobs.size():
+		_nodes[rebuilt[job]].apply_surfaces(jobs[job].surfaces)
+		jobs[job].chunk.dirty = false
 	return rebuilt
+
+
+func _run_on_workers(task: Callable, count: int) -> void:
+	var group: int = WorkerThreadPool.add_group_task(task, count)
+	WorkerThreadPool.wait_for_group_task_completion(group)
 
 
 func _mark_dirty(chunk_x: int, chunk_z: int) -> void:
