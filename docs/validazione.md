@@ -2,6 +2,8 @@
 
 Fase 4 del piano in [analisi-progettazione.md](analisi-progettazione.md). Gate 4: zero bug bloccanti e RNF rispettati.
 
+**Gate 4 approvato da Sajmir il 15 novembre 2026**, dopo il playtest completo sul Mac. RNF-04 è accettato sulla mediana; i massimi oltre 16 ms restano un limite noto.
+
 ## Verifiche automatiche
 
 | Verifica | Come si esegue | Esito |
@@ -46,6 +48,8 @@ La misura pulita di Sajmir ha dato una modifica mediana di 24,75 ms, oltre RNF-0
 | Dopo, 1 esecuzione a 118 FPS | 20,4 ms | 38,1 ms |
 | Misura di Sajmir dopo il meshing in parallelo, 60 FPS | 18,2 ms | 26,1 ms |
 | Con scansione divisa, 4 esecuzioni a 117–144 FPS, collegato alla corrente | 7,5–12,7 ms | 20,9–35,5 ms |
+| Misura di Sajmir con scansione divisa, 60 FPS a 1080p | 15,98 ms | 24,75 ms |
+| Misura di Sajmir con scansione divisa, 59–60 FPS, finestra a 2880 × 1800 | 11,8–12,0 ms | 16,8–20,2 ms |
 
 Nelle esecuzioni a più di 60 FPS la finestra non era sincronizzata con lo schermo a 60 Hz, quindi il carico di disegno è più alto del normale. Il dato per il gate è una misura a 60 FPS.
 
@@ -62,7 +66,11 @@ Apple M1, Metal, build di debug dell'editor, 1920 × 1080, con vsync.
 
 Queste misure non sono pulite: la riga da usare per il gate è quella che si ottiene con il comando sopra, verificando che il viewport stampato sia 1920 × 1080. La build di release, ancora da provare, è di norma più veloce.
 
-Un singolo blocco di circa 1 s è comparso in più esecuzioni, sempre in punti diversi del percorso. È capitato quasi sempre quando il frame rate superava i 60 FPS nonostante il vsync, segno che la finestra non veniva presentata normalmente. Il renderer non c'entra: 0 blocchi in 8 esecuzioni tra Metal e Vulkan. La causa non è confermata. Se compare con tutto chiuso, va trattato come un bug da risolvere prima del gate. Lo strumento ora forza la finestra a 1920 × 1080 e stampa quando avviene ogni blocco oltre 500 ms.
+Un singolo blocco di circa 1 s è comparso in più esecuzioni, sempre in punti diversi del percorso. È capitato quasi sempre quando il frame rate superava i 60 FPS nonostante il vsync, segno che la finestra non veniva presentata normalmente. Il renderer non c'entra: 0 blocchi in 8 esecuzioni tra Metal e Vulkan. La causa non è confermata. Se compare con tutto chiuso, va trattato come un bug da risolvere prima del gate. Lo strumento stampa quando avviene ogni blocco oltre 500 ms.
+
+Nella misura di Sajmir con la scansione divisa il blocco è ricomparso una volta (1.008 ms a 5,4 s), in un'esecuzione a 59 FPS in cui macOS aveva portato la finestra a tutto schermo. Durare quasi esattamente 1 s fa pensare a un'attesa con timeout nella presentazione della finestra, non al codice del gioco, ma resta un'ipotesi.
+
+Lo strumento ora disegna la scena sempre a 1920 × 1080, anche se macOS ridimensiona la finestra, e stampa sia la risoluzione di disegno sia quella della finestra. Con il vsync ogni frame dura circa 16,67 ms con qualche oscillazione, quindi al posto dei frame oltre 16,67 ms conta i frame saltati, cioè quelli oltre 25 ms.
 
 ## Requisiti non funzionali
 
@@ -71,30 +79,32 @@ Un singolo blocco di circa 1 s è comparso in più esecuzioni, sempre in punti d
 | RNF-01 | ≥ 60 FPS a 1080p | Misura pulita di Sajmir: 60 FPS medi, nessun blocco. Cali isolati nell'1% più lento (fino a 30 ms) |
 | RNF-02 | 16 × 16 chunk da 16 × 16 × 64 | Rispettato |
 | RNF-03 | Generazione ≤ 5 s | Rispettato: 1,7–2,9 s |
-| RNF-04 | Ricostruzione del chunk entro un frame (≤ 16 ms) | Mediana 7,6–8,2 ms dopo l'ottimizzazione: da confermare con la misura pulita |
+| RNF-04 | Ricostruzione del chunk entro un frame (≤ 16 ms) | Misure di Sajmir: mediana 11,8–15,98 ms, massimo fino a 24,75 ms. La mediana rientra, al limite a 1080p. Ogni modifica ricostruisce fino a 3 chunk |
 | RNF-05 | Circa 4 MB di dati blocco | Rispettato: 4.194.304 byte |
 | RNF-06 | Tipi statici, warning come errori, test | Rispettato |
 | RNF-07 | Godot 4.7 | Rispettato |
 
 ## Playtest sul Mac
 
-- [ ] Nuovo mondo senza seed: il terreno è diverso a ogni partita
-- [ ] Nuovo mondo con un seed: ripetendo lo stesso seed il terreno è identico
-- [ ] Camminare, saltare, guardarsi attorno con il mouse
-- [ ] Rompere e piazzare con tutti gli 8 blocchi, scelti con i tasti 1–8 e con la rotella
-- [ ] Il piazzamento addosso al giocatore viene rifiutato
-- [ ] Raggiungere ogni bordo del mondo: non si può uscire
-- [ ] Scavare fino in fondo: non si cade fuori dal mondo
-- [ ] Modificare blocchi ai bordi tra chunk: nessun buco né scatto evidente
-- [ ] Costruire una casetta, Esc, Salva, Menu principale, Carica: la casetta è identica
-- [ ] Salvare, chiudere il gioco, riaprirlo, Carica: la casetta è identica
-- [ ] Riprendi, Menu principale ed Esci funzionano dalla pausa
+- [x] Nuovo mondo senza seed: il terreno è diverso a ogni partita
+- [x] Nuovo mondo con un seed: ripetendo lo stesso seed il terreno è identico
+- [x] Camminare, saltare, guardarsi attorno con il mouse
+- [x] Rompere e piazzare con tutti gli 8 blocchi, scelti con i tasti 1–8 e con la rotella
+- [x] Il piazzamento addosso al giocatore viene rifiutato
+- [x] Raggiungere ogni bordo del mondo: non si può uscire
+- [x] Scavare fino in fondo: non si cade fuori dal mondo
+- [x] Modificare blocchi ai bordi tra chunk: nessun buco né scatto evidente
+- [x] Costruire una casetta, Esc, Salva, Menu principale, Carica: la casetta è identica
+- [x] Salvare, chiudere il gioco, riaprirlo, Carica: la casetta è identica
+- [x] Riprendi, Menu principale ed Esci funzionano dalla pausa
 
 ## Export macOS
 
-Il Mac ha i template di export per Godot 4.6.3, non per la 4.7.
+Il preset è in `export_presets.cfg`: binario universale, firma ad-hoc, senza notarizzazione. Esclude `tools/`, `test/`, `poc/`, `docs/` e `addons/`. Servono i template di export della 4.7 (Editor → Manage Export Templates → Download and Install). Per esportare l'architettura arm64 la 4.7 richiede l'importazione delle texture ETC2/ASTC, attiva in `project.godot`.
 
-1. Nell'editor: Editor → Manage Export Templates → Download and Install.
-2. Project → Export → Add → macOS, con bundle identifier a piacere e firma ad-hoc.
-3. Nella scheda Resources, in "Filters to exclude": `tools/*, test/*, poc/*, docs/*`.
-4. Export Project e avvio dell'app, poi la misura e il playtest sulla build esportata.
+```sh
+"$GODOT_BIN" --headless --path . --export-release "macOS" "build/macos/Viaggio ai confini del mondo.app"
+open "build/macos/Viaggio ai confini del mondo.app"
+```
+
+La build esportata pesa 164 MB e si avvia senza errori. Gli strumenti di `tools/qa/` non sono inclusi, quindi la misura delle prestazioni resta sulla build dell'editor.

@@ -13,7 +13,9 @@ const PATH_LOOK_AHEAD: float = 0.01
 const PATH_LOOK_DOWN: float = 3.0
 const USEC_PER_SECOND: float = 1000000.0
 const USEC_PER_MILLISECOND: float = 1000.0
-const FRAME_BUDGET_USEC: int = 16667
+# With vsync every frame lasts about 16.67 ms with some jitter: a frame that
+# lasts one and a half periods has missed at least one refresh.
+const MISSED_FRAME_USEC: int = 25000
 const STALL_USEC: int = 500000
 const TARGET_WINDOW_SIZE: Vector2i = Vector2i(1920, 1080)
 
@@ -36,6 +38,10 @@ var _restore_id: int = BlockTable.AIR
 func _ready() -> void:
 	get_window().mode = Window.MODE_WINDOWED
 	get_window().size = TARGET_WINDOW_SIZE
+	# macOS can resize the window to the whole screen: the scene still renders
+	# at 1080p and is scaled to the window.
+	get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
+	get_window().content_scale_size = TARGET_WINDOW_SIZE
 	if NO_VSYNC_ARGUMENT in OS.get_cmdline_user_args():
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 		Engine.max_fps = 0
@@ -122,11 +128,11 @@ func _finish() -> void:
 	edits.sort()
 	var count: int = frames.size()
 	var total_usec: int = 0
-	var over_budget: int = 0
+	var missed: int = 0
 	for frame_usec: int in frames:
 		total_usec += frame_usec
-		if frame_usec > FRAME_BUDGET_USEC:
-			over_budget += 1
+		if frame_usec > MISSED_FRAME_USEC:
+			missed += 1
 	var average_fps: float = count / (total_usec / USEC_PER_SECOND)
 	var worst_one_percent_ms: float = frames[int(count * 0.99)] / USEC_PER_MILLISECOND
 	var worst_ms: float = frames[-1] / USEC_PER_MILLISECOND
@@ -136,20 +142,20 @@ func _finish() -> void:
 	var block_bytes: int = _world.data.chunks.size() * ChunkData.VOLUME
 	var static_mb: float = Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0
 	var video_mb: float = Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0
-	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
-	print("Perf: Godot %s, debug build %s, viewport %s, vsync %s" % [
-		Engine.get_version_info()["string"], OS.is_debug_build(), viewport_size,
+	var render_size: Vector2i = get_viewport().get_texture().get_size()
+	print("Perf: Godot %s, debug build %s, rendering %s, window %s, vsync %s" % [
+		Engine.get_version_info()["string"], OS.is_debug_build(), render_size, get_window().size,
 		DisplayServer.window_get_vsync_mode() != DisplayServer.VSYNC_DISABLED,
 	])
-	print("RNF-01: %d frame | FPS medio %.1f | 1%% peggiore %.2f ms | massimo %.2f ms | oltre 16,67 ms: %d" % [
-		count, average_fps, worst_one_percent_ms, worst_ms, over_budget,
+	print("RNF-01: %d frame | FPS medio %.1f | 1%% peggiore %.2f ms | massimo %.2f ms | frame saltati: %d" % [
+		count, average_fps, worst_one_percent_ms, worst_ms, missed,
 	])
 	print("Blocchi oltre 500 ms: %d %s" % [stalls.size(), ", ".join(stalls)])
 	print("RNF-03: caricamento %.3f s" % load_s)
 	print("RNF-04: %d modifiche | mediana %.2f ms | massimo %.2f ms" % [edits.size(), edit_median_ms, edit_worst_ms])
 	print("RNF-05: dati blocco %d byte | memoria statica %.0f MB | memoria video %.0f MB" % [block_bytes, static_mb, video_mb])
 	_append_log([
-		Time.get_datetime_string_from_system(), average_fps, worst_one_percent_ms, worst_ms, over_budget,
+		Time.get_datetime_string_from_system(), average_fps, worst_one_percent_ms, worst_ms, missed,
 		load_s, edit_median_ms, edit_worst_ms, block_bytes,
 	])
 	get_tree().quit()
@@ -173,6 +179,6 @@ func _append_log(values: Array) -> void:
 		return
 	file.seek_end()
 	if not existed:
-		file.store_line("data,fps_medio,uno_percento_ms,massimo_ms,oltre_budget,caricamento_s,modifica_mediana_ms,modifica_massimo_ms,byte_blocchi")
+		file.store_line("data,fps_medio,uno_percento_ms,massimo_ms,frame_saltati,caricamento_s,modifica_mediana_ms,modifica_massimo_ms,byte_blocchi")
 	file.store_line(",".join(values.map(func(value: Variant) -> String: return str(value))))
 	file.close()
