@@ -54,7 +54,7 @@ L'MVP ha 6 requisiti Must, tutti al servizio di un solo ciclo di gioco: muoversi
 | RF-25 | Tempo di rottura diverso per tipo di blocco | Should |
 | RF-26 | Crafting minimo: 3–5 ricette | Should |
 | RF-27 | Fame | Could |
-| RF-28 | Nemici con IA semplice | Won't (per ora) |
+| RF-28 | Nemici con IA semplice | Should (per ora) |
 
 ## Requisiti non funzionali
 
@@ -140,7 +140,7 @@ Il mirino usa un attraversamento della griglia voxel per voxel (algoritmo DDA di
 
 1. `set_block(posizione, id)` aggiorna il byte nel chunk.
 2. Il chunk viene segnato da ricostruire; se il blocco è sul bordo, anche il chunk vicino.
-3. A fine frame si ricostruiscono mesh e collisione dei soli chunk segnati.
+3. A fine frame si ricostruiscono mesh e collisione dei soli chunk segnati. Il piazzamento ricostruisce subito, prima della fisica, altrimenti il giocatore può entrare nella cella appena occupata.
 4. La modifica entra nel registro delle differenze usato dal salvataggio.
 
 ### Salvataggio
@@ -149,7 +149,7 @@ Il file contiene seed, posizione del giocatore e solo i blocchi modificati, ragg
 
 ### Thread
 
-Nell'MVP tutto gira sul main thread: la generazione avviene dietro una schermata di caricamento, distribuita su più frame. Su desktop i thread sono disponibili: se il PoC 2 lo richiede, generazione e meshing passano al WorkerThreadPool di Godot.
+La generazione avviene sul main thread dietro una schermata di caricamento, distribuita su più frame. Quando una modifica tocca più chunk, il loro meshing gira in parallelo sul WorkerThreadPool di Godot e il main thread lo attende nello stesso frame; mesh e collisione si creano poi sul main thread. La validazione ha mostrato che, dopo qualche minuto di carico, il Mac scende di frequenza e la sola ricostruzione sul main thread superava RNF-04.
 
 ## Piano SDLC
 

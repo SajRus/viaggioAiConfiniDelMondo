@@ -171,3 +171,45 @@ func test_glass_in_the_neighbor_keeps_the_border_face() -> void:
 
 	assert_int(_opaque(world.chunk_at(0, 0)).face_count).is_equal(6)
 	assert_int(_transparent(world.chunk_at(1, 0)).face_count).is_equal(5)
+
+
+func _random_chunk(rng_seed: int) -> ChunkData:
+	var chunk: ChunkData = ChunkData.new()
+	TerrainGenerator.new(rng_seed).fill_chunk(chunk, 0, 0)
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	rng.seed = rng_seed
+	for _block: int in 400:
+		var ids: PackedInt32Array = [BlockTable.AIR, BlockTable.STONE, BlockTable.GLASS, BlockTable.LEAVES]
+		chunk.set_block(rng.randi_range(0, 15), rng.randi_range(0, 63), rng.randi_range(0, 15), ids[rng.randi_range(0, 3)])
+	return chunk
+
+
+func test_top_layer_finds_the_highest_block() -> void:
+	assert_int(_mesher.top_layer(ChunkData.new())).is_equal(-1)
+	assert_int(_mesher.top_layer(_single_block_chunk(BlockTable.STONE))).is_equal(10)
+
+
+func test_scanning_in_slices_gives_the_same_faces_as_one_scan() -> void:
+	for rng_seed: int in [3, 17, 99]:
+		var chunk: ChunkData = _random_chunk(rng_seed)
+		var whole: PackedInt32Array = _mesher.scan_faces(chunk, 0, ChunkData.SIZE_Y)
+		var joined: PackedInt32Array = _mesher.scan_faces(chunk, 0, 7)
+		joined.append_array(_mesher.scan_faces(chunk, 7, 30))
+		joined.append_array(_mesher.scan_faces(chunk, 30, ChunkData.SIZE_Y))
+
+		assert_bool(joined == whole).is_true()
+
+
+func test_meshing_job_matches_a_single_threaded_build() -> void:
+	var chunk: ChunkData = _random_chunk(5)
+	var job: MeshingJob = MeshingJob.new(chunk, _mesher.top_layer(chunk) + 1)
+	for slice: ScanSlice in job.slices:
+		slice.run(_mesher)
+
+	job.finish(_mesher)
+
+	var expected: Array[ChunkSurfaceArrays] = _mesher.build_surfaces(chunk)
+	for surface: int in 2:
+		assert_bool(job.surfaces[surface].vertices == expected[surface].vertices).is_true()
+		assert_bool(job.surfaces[surface].uvs == expected[surface].uvs).is_true()
+		assert_bool(job.surfaces[surface].indices == expected[surface].indices).is_true()

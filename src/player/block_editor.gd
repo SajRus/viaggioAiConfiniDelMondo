@@ -17,4 +17,9 @@ static func place_block(manager: ChunkManager, hit: VoxelHit, id: int, player_fe
 		return false
 	if Player.box_at(player_feet, 0.0).intersects(AABB(Vector3(target), Vector3.ONE)):
 		return false
-	return manager.set_block(target.x, target.y, target.z, id)
+	if not manager.set_block(target.x, target.y, target.z, id):
+		return false
+	# Not left to the end of the frame: physics runs first and could carry the
+	# player into a cell whose collision does not exist yet.
+	manager.flush()
+	return true

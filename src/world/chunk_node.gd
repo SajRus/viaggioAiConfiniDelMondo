@@ -15,7 +15,11 @@ func _init(material: Material) -> void:
 
 
 func rebuild(mesher: ChunkMesher, chunk: ChunkData) -> void:
-	var surfaces: Array[ChunkSurfaceArrays] = mesher.build_surfaces(chunk)
+	apply_surfaces(mesher.build_surfaces(chunk))
+
+
+## Main thread only: creates the mesh and the collision shape.
+func apply_surfaces(surfaces: Array[ChunkSurfaceArrays]) -> void:
 	_mesh_instance.mesh = ChunkMesher.mesh_from_surfaces(surfaces)
 	var faces: PackedVector3Array = ChunkCollision.build_faces(surfaces)
 	_shape = ConcavePolygonShape3D.new()
