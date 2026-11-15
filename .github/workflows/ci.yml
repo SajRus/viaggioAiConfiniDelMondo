@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 permissions:
   contents: read
   actions: read
-  checks: write
 
 jobs:
   test:
@@ -39,3 +39,6 @@ jobs:
           # gdUnit4 6.x rifiuta l'headless senza questa opzione.
           arguments: --ignoreHeadlessMode
           warnings-as-errors: true
+          # Il check run del report a volte riceve 404 e fa fallire job con test
+          # verdi. L'esito resta del passo dei test; il report va negli artifact.
+          publish-report: false

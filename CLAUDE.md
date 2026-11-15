@@ -49,7 +49,7 @@ export GODOT_BIN="/Applications/Godot 2.app/Contents/MacOS/Godot"
 ./addons/gdUnit4/runtest.sh --headless --ignoreHeadlessMode --audio-driver Dummy --add res://test
 ```
 
-La CI (`.github/workflows/ci.yml`) esegue gli stessi test a ogni push e PR, con gli stessi warning come errori.
+La CI (`.github/workflows/ci.yml`) esegue gli stessi test a ogni PR e a ogni push su `main`, con gli stessi warning come errori. Il report JUnit si scarica dagli artifact del job.
 
 In modalità headless gli `InputEvent` non arrivano al gioco. I test che simulano input con lo scene runner richiederanno `headless: false` in CI, che usa un display virtuale.
 
