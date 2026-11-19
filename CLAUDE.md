@@ -11,6 +11,7 @@ Sandbox voxel 3D in prima persona, con mondo finito. Godot 4.7, GDScript, render
 - Scope: solo ciò che è previsto dai requisiti. Ciò che non è Must aspetta la chiusura dell'MVP.
 - Versione del motore fissata a Godot 4.7. Nessuna migrazione a 4.8 prima della fine dell'MVP.
 - Texture: PNG 16 × 16 generati con ChatGPT o presi online solo con licenza d'uso (per esempio CC0). Nessun asset o marchio di Minecraft.
+- I salvataggi dei giocatori devono sopravvivere a ogni aggiornamento (sezione "Salvataggio" del documento). Una nuova sezione del file non cambia versione; cambiare una sezione esistente richiede una nuova versione in `SaveCodec`, la lettura di tutte le precedenti e un nuovo file d'esempio in `test/save/fixtures/`. I file d'esempio esistenti non si rigenerano mai. Gli ID dei blocchi non si rinumerano, il nome del progetto e il percorso del salvataggio non cambiano.
 - Ogni modifica passa da una PR su GitHub. Gli agenti non vedono il gioco: ciò che si vede o si misura lo verifica Sajmir sul Mac.
 
 ## Stile GDScript

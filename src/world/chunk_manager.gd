@@ -1,18 +1,13 @@
 class_name ChunkManager
 extends RefCounted
 
-var diffs: BlockDiffLog
-
 var _world: WorldData
 var _mesher: ChunkMesher
 var _nodes: Array[ChunkNode]
 var _dirty_indices: PackedInt32Array = PackedInt32Array()
 
 
-func _init(
-	world: WorldData, mesher: ChunkMesher, nodes: Array[ChunkNode], block_diffs: BlockDiffLog = BlockDiffLog.new()
-) -> void:
-	diffs = block_diffs
+func _init(world: WorldData, mesher: ChunkMesher, nodes: Array[ChunkNode]) -> void:
 	_world = world
 	_mesher = mesher
 	_nodes = nodes
@@ -31,7 +26,6 @@ func set_block(x: int, y: int, z: int, id: int) -> bool:
 	var chunk_z: int = z >> WorldData.CHUNK_BITS
 	var local_x: int = x & WorldData.CHUNK_MASK
 	var local_z: int = z & WorldData.CHUNK_MASK
-	diffs.record(chunk_x + _world.chunks_x * chunk_z, ChunkData.index_of(local_x, y, local_z), id)
 	_mark_dirty(chunk_x, chunk_z)
 	if local_x == 0:
 		_mark_dirty(chunk_x - 1, chunk_z)

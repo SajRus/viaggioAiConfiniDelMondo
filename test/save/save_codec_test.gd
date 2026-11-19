@@ -4,23 +4,34 @@ extends GdUnitTestSuite
 func _sample() -> WorldSave:
 	var state: WorldSave = WorldSave.new()
 	state.world_seed = -987654321012
+	state.chunks_per_side = 2
+	state.blocks.resize(4 * ChunkData.VOLUME)
+	state.blocks[0] = BlockTable.STONE
+	state.blocks[ChunkData.VOLUME - 1] = BlockTable.GLASS
+	state.blocks[state.blocks.size() - 1] = BlockTable.PLANKS
+	state.has_player_position = true
 	state.player_position = Vector3(128.5, 27.25, 3.75)
-	state.diffs.record(0, 0, BlockTable.AIR)
-	state.diffs.record(0, ChunkData.VOLUME - 1, BlockTable.GLASS)
-	state.diffs.record(255, 300, BlockTable.PLANKS)
 	return state
+
+
+func _section(tag: String, content: PackedByteArray) -> PackedByteArray:
+	var bytes: PackedByteArray = PackedByteArray()
+	bytes.resize(SaveCodec.SECTION_HEADER_BYTES)
+	bytes.encode_u32(0, SaveCodec.tag_value(tag))
+	bytes.encode_u32(4, content.size())
+	bytes.append_array(content)
+	return bytes
 
 
 func test_round_trip_keeps_every_field() -> void:
 	var decoded: WorldSave = SaveCodec.decode(SaveCodec.encode(_sample()))
 
+	assert_int(decoded.source_version).is_equal(SaveCodec.VERSION)
 	assert_int(decoded.world_seed).is_equal(-987654321012)
+	assert_int(decoded.chunks_per_side).is_equal(2)
+	assert_bool(decoded.blocks == _sample().blocks).is_true()
 	assert_bool(decoded.has_player_position).is_true()
 	assert_vector(decoded.player_position).is_equal(Vector3(128.5, 27.25, 3.75))
-	assert_array(decoded.diffs.chunk_indices()).is_equal([0, 255] as Array[int])
-	assert_int(decoded.diffs.entries_of(0)[ChunkData.VOLUME - 1]).is_equal(BlockTable.GLASS)
-	assert_int(decoded.diffs.entries_of(255)[300]).is_equal(BlockTable.PLANKS)
-	assert_int(decoded.diffs.block_count()).is_equal(3)
 
 
 func test_file_starts_with_the_version_number() -> void:
@@ -29,12 +40,38 @@ func test_file_starts_with_the_version_number() -> void:
 	assert_int(bytes.decode_u32(0)).is_equal(SaveCodec.VERSION)
 
 
-func test_size_depends_only_on_the_modified_blocks() -> void:
+func test_blocks_are_compressed() -> void:
 	var bytes: PackedByteArray = SaveCodec.encode(_sample())
 
-	assert_int(bytes.size()).is_equal(
-		SaveCodec.HEADER_BYTES + 2 * SaveCodec.GROUP_HEADER_BYTES + 3 * SaveCodec.ENTRY_BYTES
-	)
+	assert_int(bytes.size()).is_less(_sample().blocks.size() >> 7)
+
+
+func test_save_without_player_section_has_no_position() -> void:
+	var state: WorldSave = _sample()
+	state.has_player_position = false
+
+	assert_bool(SaveCodec.decode(SaveCodec.encode(state)).has_player_position).is_false()
+
+
+func test_unknown_sections_are_skipped() -> void:
+	var bytes: PackedByteArray = SaveCodec.encode(_sample())
+	var with_extra: PackedByteArray = bytes.slice(0, SaveCodec.VERSION_BYTES)
+	with_extra.append_array(_section("ZZZZ", PackedByteArray([1, 2, 3])))
+	with_extra.append_array(bytes.slice(SaveCodec.VERSION_BYTES))
+
+	var decoded: WorldSave = SaveCodec.decode(with_extra)
+
+	assert_object(decoded).is_not_null()
+	assert_bool(decoded.blocks == _sample().blocks).is_true()
+
+
+func test_save_without_world_section_is_rejected() -> void:
+	var bytes: PackedByteArray = PackedByteArray()
+	bytes.resize(SaveCodec.VERSION_BYTES)
+	bytes.encode_u32(0, SaveCodec.VERSION)
+	bytes.append_array(_section(SaveCodec.TAG_PLAYER, SaveCodec.encode(_sample()).slice(12, 24)))
+
+	assert_object(SaveCodec.decode(bytes)).is_null()
 
 
 func test_unknown_version_is_rejected() -> void:
@@ -58,15 +95,15 @@ func test_trailing_bytes_are_rejected() -> void:
 	assert_object(SaveCodec.decode(bytes)).is_null()
 
 
-func test_block_index_outside_the_chunk_is_rejected() -> void:
-	var state: WorldSave = WorldSave.new()
-	state.diffs.record(0, ChunkData.VOLUME, BlockTable.STONE)
+func test_blocks_of_the_wrong_size_are_rejected() -> void:
+	var state: WorldSave = _sample()
+	state.chunks_per_side = 3
 
 	assert_object(SaveCodec.decode(SaveCodec.encode(state))).is_null()
 
 
 func test_non_finite_position_is_rejected() -> void:
-	var state: WorldSave = WorldSave.new()
+	var state: WorldSave = _sample()
 	state.player_position = Vector3(INF, 0.0, 0.0)
 
 	assert_object(SaveCodec.decode(SaveCodec.encode(state))).is_null()

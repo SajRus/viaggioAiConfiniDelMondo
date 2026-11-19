@@ -27,6 +27,14 @@ func coords_of(index: int) -> Vector2i:
 	return Vector2i(index % chunks_x, index / chunks_x)
 
 
+## Every block, chunk after chunk in index order.
+func to_bytes() -> PackedByteArray:
+	var bytes: PackedByteArray = PackedByteArray()
+	for chunk: ChunkData in chunks:
+		bytes.append_array(chunk.blocks)
+	return bytes
+
+
 func is_inside(x: int, y: int, z: int) -> bool:
 	return (
 		x >= 0 and x < chunks_x * ChunkData.SIZE_X

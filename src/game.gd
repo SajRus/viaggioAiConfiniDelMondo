@@ -20,7 +20,10 @@ func _ready() -> void:
 	_pause.main_menu_requested.connect(_on_main_menu_requested)
 	_pause.quit_requested.connect(_on_quit_requested)
 	_session = SaveSystem.take_request()
-	_world.start_generation(_session.world_seed, _session.diffs)
+	if _session.chunks_per_side > 0:
+		_world.chunks_per_side = _session.chunks_per_side
+	_world.start_generation(_session.world_seed, _session.blocks, _session.diffs)
+	_session.blocks = PackedByteArray()
 
 
 func _process(_delta: float) -> void:
@@ -35,15 +38,24 @@ func _on_world_loaded() -> void:
 	_player.human_controlled = true
 	_loading.visible = false
 	_pause.enabled = true
+	# An older save is rewritten at once, while the world it describes is still
+	# the one this version can rebuild. SaveSystem.read() kept a backup.
+	if _session.source_version != 0 and _session.source_version != SaveCodec.VERSION:
+		_save()
 
 
 func _on_save_requested() -> void:
+	_pause.show_status("Partita salvata" if _save() else "Salvataggio non riuscito")
+
+
+func _save() -> bool:
 	var state: WorldSave = WorldSave.new()
 	state.world_seed = _session.world_seed
+	state.chunks_per_side = _world.chunks_per_side
+	state.blocks = _world.data.to_bytes()
 	state.has_player_position = true
 	state.player_position = _player.global_position
-	state.diffs = _world.manager.diffs
-	_pause.show_status("Partita salvata" if SaveSystem.write(state) else "Salvataggio non riuscito")
+	return SaveSystem.write(state)
 
 
 func _on_main_menu_requested() -> void:

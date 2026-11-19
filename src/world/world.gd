@@ -18,6 +18,7 @@ var manager: ChunkManager
 
 var _mesher: ChunkMesher = ChunkMesher.new(BlockRegistry)
 var _generator: TerrainGenerator
+var _saved_blocks: PackedByteArray
 var _saved_diffs: BlockDiffLog
 var _nodes: Array[ChunkNode] = []
 var _phase: Phase = Phase.IDLE
@@ -38,12 +39,18 @@ func _process(_delta: float) -> void:
 			manager.flush()
 
 
-## Starts generating over the next frames, then emits [signal loaded].
-## [param saved_diffs] are the edits of a saved world, reapplied over the terrain.
-func start_generation(world_seed: int, saved_diffs: BlockDiffLog = BlockDiffLog.new()) -> void:
+## Starts loading over the next frames, then emits [signal loaded].
+## [param saved_blocks] are all the blocks of a saved world, used instead of the
+## terrain when their size matches. [param saved_diffs] are the edits of a
+## version 1 save, reapplied over the generated terrain.
+func start_generation(
+	world_seed: int, saved_blocks: PackedByteArray = PackedByteArray(), saved_diffs: BlockDiffLog = BlockDiffLog.new()
+) -> void:
 	data = WorldData.new(chunks_per_side, chunks_per_side)
+	var volume: int = data.chunks.size() * ChunkData.VOLUME
+	_saved_blocks = saved_blocks if saved_blocks.size() == volume else PackedByteArray()
 	_saved_diffs = saved_diffs
-	manager = ChunkManager.new(data, _mesher, _nodes, saved_diffs)
+	manager = ChunkManager.new(data, _mesher, _nodes)
 	_generator = TerrainGenerator.new(world_seed)
 	_add_border_walls()
 	_next_chunk = 0
@@ -80,11 +87,17 @@ func chunk_nodes() -> Array[ChunkNode]:
 func _generate_step() -> void:
 	var start: int = Time.get_ticks_usec()
 	while _next_chunk < data.chunks.size() and Time.get_ticks_usec() - start < LOAD_BUDGET_USEC:
-		var coords: Vector2i = data.coords_of(_next_chunk)
-		_generator.fill_chunk(data.chunks[_next_chunk], coords.x, coords.y)
+		if _saved_blocks.is_empty():
+			var coords: Vector2i = data.coords_of(_next_chunk)
+			_generator.fill_chunk(data.chunks[_next_chunk], coords.x, coords.y)
+		else:
+			var first: int = _next_chunk * ChunkData.VOLUME
+			data.chunks[_next_chunk].blocks = _saved_blocks.slice(first, first + ChunkData.VOLUME)
 		_next_chunk += 1
 	if _next_chunk == data.chunks.size():
 		_apply_saved_diffs()
+		_saved_blocks = PackedByteArray()
+		_saved_diffs = BlockDiffLog.new()
 		_next_chunk = 0
 		_phase = Phase.MESHING
 
