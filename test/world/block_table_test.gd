@@ -1,6 +1,16 @@
 extends GdUnitTestSuite
 
 
+func test_block_ids_never_change() -> void:
+	# Saves store these numbers: a new block takes a free ID instead.
+	var ids: Array[int] = [
+		BlockTable.AIR, BlockTable.GRASS, BlockTable.DIRT, BlockTable.STONE,
+		BlockTable.SAND, BlockTable.LOG, BlockTable.LEAVES, BlockTable.PLANKS, BlockTable.GLASS,
+	]
+
+	assert_array(ids).is_equal([0, 1, 2, 3, 4, 5, 6, 7, 8] as Array[int])
+
+
 func test_air_is_not_solid() -> void:
 	assert_int(BlockRegistry.solid[BlockTable.AIR]).is_equal(0)
 
