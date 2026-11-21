@@ -13,10 +13,12 @@ static func expected_face_count(world: WorldData, table: BlockTable) -> int:
 			for x: int in size_x:
 				if table.solid[world.get_block_world(x, y, z)] == 0:
 					continue
+				var id: int = world.get_block_world(x, y, z)
 				for offset: Vector3i in [
 					Vector3i.RIGHT, Vector3i.LEFT, Vector3i.UP, Vector3i.DOWN, Vector3i.BACK, Vector3i.FORWARD,
 				]:
-					if table.occluding[world.get_block_world(x + offset.x, y + offset.y, z + offset.z)] == 0:
+					var neighbor: int = world.get_block_world(x + offset.x, y + offset.y, z + offset.z)
+					if table.occluding[neighbor] == 0 and neighbor != id:
 						faces += 1
 	return faces
 

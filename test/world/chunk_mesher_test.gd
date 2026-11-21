@@ -75,10 +75,27 @@ func test_opaque_face_stays_visible_behind_glass() -> void:
 	assert_int(_transparent(chunk).face_count).is_equal(5)
 
 
-func test_faces_between_transparent_blocks_are_kept() -> void:
+func test_faces_between_two_blocks_of_the_same_glass_are_culled() -> void:
 	var positions: Array[Vector3i] = [Vector3i(5, 10, 7), Vector3i(6, 10, 7)]
 
-	assert_int(_transparent(_chunk_with(positions, BlockTable.GLASS)).face_count).is_equal(12)
+	assert_int(_transparent(_chunk_with(positions, BlockTable.GLASS)).face_count).is_equal(10)
+
+
+func test_faces_between_different_transparent_blocks_are_kept() -> void:
+	var chunk: ChunkData = ChunkData.new()
+	chunk.set_block(5, 10, 7, BlockTable.GLASS)
+	chunk.set_block(6, 10, 7, BlockTable.LEAVES)
+
+	assert_int(_transparent(chunk).face_count).is_equal(12)
+
+
+func test_leaves_across_a_chunk_border_share_no_face() -> void:
+	var world: WorldData = WorldData.new(2, 1)
+	world.chunk_at(0, 0).set_block(15, 10, 7, BlockTable.LEAVES)
+	world.chunk_at(1, 0).set_block(0, 10, 7, BlockTable.LEAVES)
+
+	assert_int(_transparent(world.chunk_at(0, 0)).face_count).is_equal(5)
+	assert_int(_transparent(world.chunk_at(1, 0)).face_count).is_equal(5)
 
 
 func test_every_face_is_clockwise_from_outside() -> void:

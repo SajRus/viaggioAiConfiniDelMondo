@@ -12,6 +12,12 @@ var has_player_position: bool = false
 var player_position: Vector3 = Vector3.ZERO
 ## Version 1 saves only: edits to reapply over the generated terrain.
 var diffs: BlockDiffLog = BlockDiffLog.new()
+## Survival only: a save without these is a creative world.
+var survival: bool = false
+var health: int = Health.MAX
+## One entry per inventory slot, or empty for an empty inventory.
+var inventory_items: PackedInt32Array = PackedInt32Array()
+var inventory_counts: PackedInt32Array = PackedInt32Array()
 
 
 ## Empty text picks a random seed; anything that is not a number is hashed.

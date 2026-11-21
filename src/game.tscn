@@ -6,6 +6,9 @@
 [ext_resource type="Texture2D" path="res://assets/textures/atlas.png" id="4_atlas"]
 [ext_resource type="PackedScene" path="res://src/player/player.tscn" id="5_player"]
 [ext_resource type="PackedScene" path="res://src/ui/pause_menu.tscn" id="6_pause"]
+[ext_resource type="Script" path="res://src/ui/health_view.gd" id="7_health"]
+[ext_resource type="Script" path="res://src/ui/inventory_view.gd" id="8_inventory"]
+[ext_resource type="PackedScene" path="res://src/ui/death_screen.tscn" id="9_death"]
 
 [sub_resource type="StandardMaterial3D" id="Material_atlas"]
 transparency = 2
@@ -69,6 +72,22 @@ grow_vertical = 0
 script = ExtResource("3_hotbar")
 atlas = ExtResource("4_atlas")
 
+[node name="Health" type="Control" parent="Hud"]
+visible = false
+mouse_filter = 2
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -100.0
+offset_right = 150.0
+offset_bottom = -78.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("7_health")
+
 [node name="Loading" type="Label" parent="Hud"]
 mouse_filter = 2
 anchors_preset = 8
@@ -86,3 +105,22 @@ horizontal_alignment = 1
 layer = 2
 
 [node name="Pause" parent="PauseLayer" instance=ExtResource("6_pause")]
+
+[node name="InventoryLayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="Inventory" type="Control" parent="InventoryLayer"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("8_inventory")
+atlas = ExtResource("4_atlas")
+
+[node name="DeathLayer" type="CanvasLayer" parent="."]
+layer = 3
+
+[node name="Death" parent="DeathLayer" instance=ExtResource("9_death")]
