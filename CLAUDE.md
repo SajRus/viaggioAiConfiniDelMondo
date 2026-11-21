@@ -28,7 +28,7 @@ Sandbox voxel 3D in prima persona, con mondo finito. Godot 4.7, GDScript, render
 
 | Cartella | Contenuto |
 | --- | --- |
-| `src/` | Codice del gioco: `world/`, `player/`, `save/`, `ui/` |
+| `src/` | Codice del gioco: `world/`, `player/`, `survival/`, `save/`, `ui/` |
 | `test/` | Test gdUnit4, stessa struttura di `src/`, file `*_test.gd`. `test/support/` contiene gli strumenti di verifica |
 | `tools/qa/` | Prova di resistenza e misura delle prestazioni, vedi `docs/validazione.md` |
 | `assets/textures/` | Texture |

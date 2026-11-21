@@ -2,8 +2,10 @@ class_name MainMenu
 extends Control
 
 const GAME_SCENE: String = "res://src/game.tscn"
+const MODE_SURVIVAL: int = 1
 
 @onready var _seed: LineEdit = %Seed
+@onready var _mode: OptionButton = %Mode
 @onready var _new: Button = %New
 @onready var _load: Button = %Load
 @onready var _quit: Button = %Quit
@@ -20,9 +22,15 @@ func _ready() -> void:
 
 
 func _on_new_pressed() -> void:
+	_open_game(new_world_state())
+
+
+## The world the menu fields describe.
+func new_world_state() -> WorldSave:
 	var state: WorldSave = WorldSave.new()
 	state.world_seed = WorldSave.seed_from_text(_seed.text)
-	_open_game(state)
+	state.survival = _mode.get_selected_id() == MODE_SURVIVAL
+	return state
 
 
 func _on_load_pressed() -> void:

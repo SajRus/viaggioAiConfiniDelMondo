@@ -42,16 +42,19 @@ func _process(_delta: float) -> void:
 ## Starts loading over the next frames, then emits [signal loaded].
 ## [param saved_blocks] are all the blocks of a saved world, used instead of the
 ## terrain when their size matches. [param saved_diffs] are the edits of a
-## version 1 save, reapplied over the generated terrain.
+## version 1 save, reapplied over the terrain of [param terrain_version].
 func start_generation(
-	world_seed: int, saved_blocks: PackedByteArray = PackedByteArray(), saved_diffs: BlockDiffLog = BlockDiffLog.new()
+	world_seed: int,
+	saved_blocks: PackedByteArray = PackedByteArray(),
+	saved_diffs: BlockDiffLog = BlockDiffLog.new(),
+	terrain_version: int = TerrainGenerator.LATEST_VERSION,
 ) -> void:
 	data = WorldData.new(chunks_per_side, chunks_per_side)
 	var volume: int = data.chunks.size() * ChunkData.VOLUME
 	_saved_blocks = saved_blocks if saved_blocks.size() == volume else PackedByteArray()
 	_saved_diffs = saved_diffs
 	manager = ChunkManager.new(data, _mesher, _nodes)
-	_generator = TerrainGenerator.new(world_seed)
+	_generator = TerrainGenerator.new(world_seed, terrain_version)
 	_add_border_walls()
 	_next_chunk = 0
 	_phase = Phase.GENERATING

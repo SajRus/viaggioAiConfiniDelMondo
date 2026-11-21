@@ -51,3 +51,12 @@ func test_corrupted_save_shows_a_message_and_stays_in_the_menu() -> void:
 
 	assert_str(status.text).is_not_empty()
 	assert_object(get_tree().current_scene).is_not_instanceof(Node3D)
+
+
+func test_new_world_is_creative_unless_survival_is_chosen() -> void:
+	var menu: MainMenu = _open_menu()
+	var mode: OptionButton = menu.get_node("%Mode")
+
+	assert_bool(menu.new_world_state().survival).is_false()
+	mode.select(1)
+	assert_bool(menu.new_world_state().survival).is_true()

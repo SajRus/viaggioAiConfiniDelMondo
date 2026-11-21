@@ -40,7 +40,7 @@ L'MVP ha 6 requisiti Must, tutti al servizio di un solo ciclo di gioco: muoversi
 | RF-06 | Hotbar con 6–8 tipi di blocco, selezione con tasti numerici o rotella | Must |
 | RF-07 | Salvataggio e caricamento del mondo | Should |
 | RF-08 | Menu principale e menu di pausa: nuovo mondo, carica, esci | Should |
-| RF-09 | Alberi semplici generati sul terreno | Could |
+| RF-09 | Alberi semplici generati sul terreno | Could, anticipato nella 5a: il crafting ha bisogno di legno |
 | RF-10 | Volo in modalità creativa | Could |
 | RF-11 | Ciclo giorno/notte visivo | Could |
 
@@ -124,12 +124,17 @@ Ogni chunk ha un flag "da ricostruire" e conosce i quattro chunk vicini sul pian
 
 - FastNoiseLite, integrato in Godot, produce una mappa delle altezze 2D a partire dal seed del mondo.
 - Per ogni colonna: pietra in profondità, 3 blocchi di terra, erba in superficie.
-- La generazione è deterministica: stesso seed, stesso mondo. Su questo si basa il salvataggio.
-- Gli alberi (RF-09) arrivano in una seconda passata, dopo il terreno.
+- La generazione è deterministica: stesso seed, stesso mondo.
+- Il terreno ha una versione. La versione 1 è quello dell'MVP, solo erba, terra e pietra, e non cambia mai: serve a ricostruire i salvataggi di versione 1. I mondi nuovi usano l'ultima versione.
+- Versione 2, introdotta nella 5a perché senza legno e sabbia le ricette sono impossibili:
+  - le colonne alte 24 blocchi o meno hanno sabbia al posto di erba e terra, circa il 15–18% della superficie;
+  - gli alberi nascono su una griglia di celle da 6 × 6 colonne, al massimo uno per cella con probabilità del 45%, mai sulla sabbia: circa 750 alberi per mondo. Tronco di 4–6 tronchi su un blocco di terra, chioma di foglie larga 5 blocchi;
+  - ogni chunk disegna anche le parti degli alberi vicini che lo toccano, così una chioma a cavallo di due chunk resta intera;
+  - la generazione del mondo intero passa da circa 140 ms a 220–470 ms.
 
 ### Meshing
 
-- Face culling: per ogni blocco solido si emette una faccia solo se il vicino in quella direzione è aria o trasparente, anche oltre il bordo del chunk.
+- Face culling: per ogni blocco solido si emette una faccia solo se il vicino in quella direzione è aria o trasparente, anche oltre il bordo del chunk. Tra due blocchi trasparenti dello stesso tipo, come due foglie o due vetri, non c'è faccia: con gli alberi della 5a le facce tra foglie erano due terzi delle facce trasparenti.
 - Output: una ArrayMesh costruita da array impacchettati (vertici, normali, UV, indici), con un solo materiale, atlante delle texture e filtro nearest.
 - I blocchi trasparenti (vetro, foglie) finiscono in una seconda superficie della mesh.
 - Il greedy meshing, che unisce le facce complanari, entra solo se i PoC mostrano troppi vertici.
@@ -160,7 +165,7 @@ Un salvataggio deve sopravvivere a ogni aggiornamento del gioco. Per questo il f
   - sezione `PLYR`: posizione del giocatore.
 - Una nuova sezione si aggiunge senza cambiare versione: chi legge salta le sezioni che non conosce, e una sezione mancante vale come valore di partenza. Cambiare il contenuto di una sezione esistente richiede una nuova versione.
 - Ogni versione nuova continua a leggere tutte le precedenti. Un file di versione vecchia si converte al primo caricamento: si copia accanto come `world.sav.v<N>.bak` e si riscrive subito nella versione attuale.
-- La versione 1 dell'MVP conteneva seed, posizione e solo i blocchi modificati. Si legge rigenerando il terreno con il generatore dell'MVP: un test ne fissa l'output, e se il generatore cambia se ne conserva una copia per i file di versione 1.
+- La versione 1 dell'MVP conteneva seed, posizione e solo i blocchi modificati. Si legge rigenerando la versione 1 del terreno, quella dell'MVP: un test ne fissa l'output.
 - Gli ID dei blocchi sono scritti nel file e non si rinumerano mai: un blocco nuovo prende un ID libero.
 - Per ogni versione c'è un file d'esempio in `test/save/fixtures/`, che i test caricano a ogni esecuzione della CI.
 - La scrittura passa da un file temporaneo, così un salvataggio fallito lascia intatto il precedente.
@@ -177,7 +182,7 @@ La 5a aggiunge una modalità sopravvivenza accanto a quella creativa, senza tocc
 
 ### Modalità di gioco
 
-- Il menu "Nuovo mondo" chiede la modalità: creativa o sopravvivenza. La modalità si salva con il mondo e non si cambia dopo.
+- Il menu "Nuovo mondo" chiede la modalità: creativa, la scelta di partenza, o sopravvivenza. La modalità si salva con il mondo e non si cambia dopo.
 - In creativa tutto resta com'è nell'MVP: hotbar fissa con 8 blocchi infiniti, rottura istantanea, nessun danno.
 - In sopravvivenza valgono RF-20, RF-21, RF-25 e RF-26.
 
@@ -190,7 +195,7 @@ La 5a aggiunge una modalità sopravvivenza accanto a quella creativa, senza tocc
 
 ### Inventario (RF-21)
 
-- 8 posti nella hotbar e 24 nello zaino. Ogni posto tiene un solo tipo di oggetto, fino a 64.
+- 8 posti nella hotbar e 24 nello zaino. Ogni posto tiene un solo tipo di oggetto: fino a 64 blocchi, oppure un solo strumento.
 - Un oggetto è un blocco o uno strumento. I blocchi tengono il loro ID da 1 a 255; gli strumenti hanno ID propri in un registro degli oggetti separato, così i byte del mondo non cambiano.
 - Un blocco rotto entra nel primo posto con lo stesso tipo e spazio libero, altrimenti nel primo posto vuoto. Se l'inventario è pieno il blocco va perso. L'erba rotta dà terra; le foglie e il vetro non danno nulla.
 - Piazzare consuma un blocco dal posto selezionato nella hotbar. Se il posto è vuoto, il clic destro non fa nulla.
@@ -227,6 +232,10 @@ I picconi non si consumano. Sono oggetti dell'inventario e agiscono solo quando 
 ### Salvataggio
 
 La 5a aggiunge al formato una sezione `SURV` con la modalità, la salute e i 32 posti dell'inventario, ognuno come ID oggetto u16 e quantità u8. È una sezione nuova, quindi il formato resta alla versione 2: un file senza `SURV`, compresi quelli di versione 1, si carica come mondo creativo. Gli ID degli strumenti, come quelli dei blocchi, non si rinumerano mai.
+
+### Materie prime
+
+Le ricette usano tronchi e sabbia, quindi la 5a porta anche la versione 2 del terreno con alberi e sabbia (vedi "Generazione del terreno"). Senza, nessuna ricetta si può fare: il primo playtest della 5a lo ha mostrato.
 
 ### Texture
 

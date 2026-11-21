@@ -8,8 +8,12 @@ const VERSION_BYTES: int = 4
 # Version 2: the version, then sections of tag u32, length u32 and content.
 const SECTION_HEADER_BYTES: int = 8
 const TAG_PLAYER: String = "PLYR"
+const TAG_SURVIVAL: String = "SURV"
 const TAG_WORLD: String = "WRLD"
 const PLAYER_BYTES: int = 12
+const MODE_SURVIVAL: int = 1
+const SURVIVAL_HEADER_BYTES: int = 2
+const SLOT_BYTES: int = 3
 const WORLD_HEADER_BYTES: int = 10
 const COMPRESSION: FileAccess.CompressionMode = FileAccess.COMPRESSION_ZSTD
 const MAX_CHUNKS_PER_SIDE: int = 64
@@ -31,6 +35,8 @@ static func encode(state: WorldSave) -> PackedByteArray:
 		player.put_float(state.player_position.y)
 		player.put_float(state.player_position.z)
 		_put_section(output, TAG_PLAYER, player.data_array)
+	if state.survival:
+		_put_section(output, TAG_SURVIVAL, _survival_content(state))
 	var world: StreamPeerBuffer = StreamPeerBuffer.new()
 	world.put_64(state.world_seed)
 	world.put_u16(state.chunks_per_side)
@@ -66,6 +72,17 @@ static func _put_section(output: StreamPeerBuffer, tag: String, content: PackedB
 	output.put_data(content)
 
 
+static func _survival_content(state: WorldSave) -> PackedByteArray:
+	var content: StreamPeerBuffer = StreamPeerBuffer.new()
+	content.put_u8(MODE_SURVIVAL)
+	content.put_u8(state.health)
+	var empty: bool = state.inventory_items.size() != Inventory.SLOTS
+	for slot: int in Inventory.SLOTS:
+		content.put_u16(ItemTable.NONE if empty else state.inventory_items[slot])
+		content.put_u8(0 if empty else state.inventory_counts[slot])
+	return content.data_array
+
+
 ## Unknown sections are skipped: a later version may add them.
 static func _decode_v2(input: StreamPeerBuffer) -> WorldSave:
 	var state: WorldSave = WorldSave.new()
@@ -81,6 +98,9 @@ static func _decode_v2(input: StreamPeerBuffer) -> WorldSave:
 		if tag == tag_value(TAG_PLAYER):
 			if not _read_player(content, state):
 				return null
+		elif tag == tag_value(TAG_SURVIVAL):
+			if not _read_survival(content, state):
+				return null
 		elif tag == tag_value(TAG_WORLD):
 			if not _read_world(content, state):
 				return null
@@ -94,6 +114,26 @@ static func _read_player(content: PackedByteArray, state: WorldSave) -> bool:
 	state.player_position = Vector3(content.decode_float(0), content.decode_float(4), content.decode_float(8))
 	state.has_player_position = true
 	return state.player_position.is_finite()
+
+
+static func _read_survival(content: PackedByteArray, state: WorldSave) -> bool:
+	if content.size() != SURVIVAL_HEADER_BYTES + Inventory.SLOTS * SLOT_BYTES:
+		return false
+	if content.decode_u8(0) != MODE_SURVIVAL:
+		return false
+	state.survival = true
+	state.health = content.decode_u8(1)
+	if state.health < 1 or state.health > Health.MAX:
+		return false
+	state.inventory_items.resize(Inventory.SLOTS)
+	state.inventory_counts.resize(Inventory.SLOTS)
+	for slot: int in Inventory.SLOTS:
+		var offset: int = SURVIVAL_HEADER_BYTES + slot * SLOT_BYTES
+		state.inventory_items[slot] = content.decode_u16(offset)
+		state.inventory_counts[slot] = content.decode_u8(offset + 2)
+		if not Inventory.is_valid_slot(state.inventory_items[slot], state.inventory_counts[slot]):
+			return false
+	return true
 
 
 static func _read_world(content: PackedByteArray, state: WorldSave) -> bool:

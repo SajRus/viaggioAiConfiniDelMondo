@@ -50,6 +50,8 @@ La misura pulita di Sajmir ha dato una modifica mediana di 24,75 ms, oltre RNF-0
 | Con scansione divisa, 4 esecuzioni a 117–144 FPS, collegato alla corrente | 7,5–12,7 ms | 20,9–35,5 ms |
 | Misura di Sajmir con scansione divisa, 60 FPS a 1080p | 15,98 ms | 24,75 ms |
 | Misura di Sajmir con scansione divisa, 59–60 FPS, finestra a 2880 × 1800 | 11,8–12,0 ms | 16,8–20,2 ms |
+| 5a con alberi, prima di togliere le facce tra foglie, 2 esecuzioni a 60 FPS | 11,7–13,7 ms | 19,8–31,9 ms |
+| 5a con alberi e senza facce tra foglie, 2 esecuzioni a 60 FPS | 8,8–10,2 ms | 15,9–17,0 ms |
 
 Nelle esecuzioni a più di 60 FPS la finestra non era sincronizzata con lo schermo a 60 Hz, quindi il carico di disegno è più alto del normale. Il dato per il gate è una misura a 60 FPS.
 
@@ -97,6 +99,25 @@ Lo strumento ora disegna la scena sempre a 1920 × 1080, anche se macOS ridimens
 - [x] Costruire una casetta, Esc, Salva, Menu principale, Carica: la casetta è identica
 - [x] Salvare, chiudere il gioco, riaprirlo, Carica: la casetta è identica
 - [x] Riprendi, Menu principale ed Esci funzionano dalla pausa
+
+## Playtest della sottofase 5a
+
+Sulla build esportata, con un nuovo mondo in sopravvivenza.
+
+- [x] Il menu propone Creativa e Sopravvivenza; un mondo creativo funziona come prima
+- [x] All'inizio la salute è 20/20 e l'inventario è vuoto
+- [x] Rompere tenendo premuto il clic sinistro: l'incrinatura cresce in 4 stadi, rilasciare o cambiare blocco azzera
+- [x] Il blocco rotto entra nell'inventario; l'erba dà terra, foglie e vetro non danno nulla
+- [x] Piazzare consuma un blocco dalla hotbar; con il posto vuoto o un piccone non si piazza nulla
+- [x] E apre e chiude l'inventario; un clic prende una pila, un secondo clic la posa, la unisce o la scambia
+- [x] Un mondo nuovo ha alberi sulle colline e sabbia nelle valli; un tronco rotto dà un tronco
+- [x] Le 4 ricette si attivano solo con gli ingredienti e producono il risultato
+- [x] La pietra a mani nude richiede circa 4 s, con il piccone di legno 1,5 s e con quello di pietra meno di 1 s
+- [x] Un salto sul piano non toglie salute; una caduta da 6 blocchi toglie 3 punti
+- [x] La salute risale di un punto ogni 4 secondi
+- [x] A salute zero compare "Sei caduto"; Rinasci riporta al punto di partenza con salute piena e lo stesso inventario
+- [x] Esc, Salva, Menu principale, Carica: salute e inventario sono quelli salvati
+- [x] Il salvataggio di prima della 5a si carica ancora, come mondo creativo
 
 ## Export macOS
 

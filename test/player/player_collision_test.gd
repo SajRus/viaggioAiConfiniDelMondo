@@ -161,3 +161,46 @@ func test_long_fall_at_top_speed_does_not_pass_through_the_floor() -> void:
 
 	assert_float(_player.global_position.y).is_equal_approx(FLOOR_TOP, 0.02)
 	assert_bool(_entered_block).is_false()
+
+
+func test_landing_reports_the_height_fallen() -> void:
+	var falls: Array[float] = []
+	_player.landed.connect(func(height: float) -> void: falls.append(height))
+	await _build_and_spawn(Vector3(8.5, FLOOR_TOP + 6.0, 8.5))
+
+	await _run_ticks(90)
+
+	assert_int(falls.size()).is_equal(1)
+	assert_float(falls[0]).is_equal_approx(6.0, 0.05)
+	assert_int(Health.fall_damage(falls[0])).is_equal(3)
+
+
+func test_a_jump_on_flat_ground_does_no_harm() -> void:
+	var falls: Array[float] = []
+	_player.landed.connect(func(height: float) -> void: falls.append(height))
+	await _build_and_spawn(Vector3(8.5, FLOOR_TOP + 0.1, 8.5))
+	await _run_ticks(30)
+	falls.clear()
+
+	_player.wish_jump = true
+	await _run_ticks(2)
+	_player.wish_jump = false
+	await _run_ticks(60)
+
+	assert_int(falls.size()).is_equal(1)
+	assert_float(falls[0]).is_between(1.0, 1.6)
+	assert_int(Health.fall_damage(falls[0])).is_equal(0)
+
+
+func test_teleport_does_not_count_as_a_fall() -> void:
+	var falls: Array[float] = []
+	_player.landed.connect(func(height: float) -> void: falls.append(height))
+	await _build_and_spawn(Vector3(8.5, FLOOR_TOP + 0.1, 8.5))
+	await _run_ticks(30)
+	falls.clear()
+
+	_player.teleport(Vector3(4.5, FLOOR_TOP, 4.5))
+	await _run_ticks(10)
+
+	for height: float in falls:
+		assert_float(height).is_less(0.2)

@@ -6,6 +6,9 @@ extends RefCounted
 
 const V1: String = "res://test/save/fixtures/world_v1.sav"
 const V2: String = "res://test/save/fixtures/world_v2.sav"
+## Version 2 with the survival section of the 5a: health 13, a stone pickaxe,
+## 64 dirt, 9 planks in the last hotbar slot and 2 glass in the last slot.
+const V2_SURVIVAL: String = "res://test/save/fixtures/world_v2_survival.sav"
 const WORLD_SEED: int = 1234
 const PLAYER_POSITION: Vector3 = Vector3(130.5, 45.25, 126.5)
 ## Blocks edited in the version 1 file: a small house and a dug hole.

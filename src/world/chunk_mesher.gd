@@ -71,6 +71,8 @@ func top_layer(chunk: ChunkData) -> int:
 
 
 ## Lists the visible faces of layers [param first_y] to [param end_y] excluded.
+## A face shows when its neighbor does not occlude and is not the same block:
+## two leaves or two panes of glass side by side share no face.
 ## Scanning consecutive ranges and joining the lists in order gives the same
 ## result as one scan. Safe on worker threads: it only reads blocks.
 func scan_faces(chunk: ChunkData, first_y: int, end_y: int) -> PackedInt32Array:
@@ -126,32 +128,32 @@ func scan_faces(chunk: ChunkData, first_y: int, end_y: int) -> PackedInt32Array:
 					east = blocks[index + 1]
 				elif has_pos_x:
 					east = pos_x_blocks[index - border_x]
-				if occluding[east] == 0:
+				if occluding[east] == 0 and east != id:
 					faces.append(entry | FACE_POS_X)
 				var west: int = BlockTable.AIR
 				if x > 0:
 					west = blocks[index - 1]
 				elif has_neg_x:
 					west = neg_x_blocks[index + border_x]
-				if occluding[west] == 0:
+				if occluding[west] == 0 and west != id:
 					faces.append(entry | FACE_NEG_X)
-				if y == size_y - 1 or occluding[blocks[index + step_y]] == 0:
+				if y == size_y - 1 or (occluding[blocks[index + step_y]] == 0 and blocks[index + step_y] != id):
 					faces.append(entry | FACE_POS_Y)
-				if y == 0 or occluding[blocks[index - step_y]] == 0:
+				if y == 0 or (occluding[blocks[index - step_y]] == 0 and blocks[index - step_y] != id):
 					faces.append(entry | FACE_NEG_Y)
 				var south: int = BlockTable.AIR
 				if z < max_z:
 					south = blocks[index + step_z]
 				elif has_pos_z:
 					south = pos_z_blocks[index - border_z]
-				if occluding[south] == 0:
+				if occluding[south] == 0 and south != id:
 					faces.append(entry | FACE_POS_Z)
 				var north: int = BlockTable.AIR
 				if z > 0:
 					north = blocks[index - step_z]
 				elif has_neg_z:
 					north = neg_z_blocks[index + border_z]
-				if occluding[north] == 0:
+				if occluding[north] == 0 and north != id:
 					faces.append(entry | FACE_NEG_Z)
 
 	return faces

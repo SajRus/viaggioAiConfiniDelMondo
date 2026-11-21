@@ -44,6 +44,17 @@ unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Seed (vuoto = casuale)"
 
+[node name="Mode" type="OptionButton" parent="Center/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+selected = 0
+item_count = 2
+popup/item_0/text = "Creativa"
+popup/item_0/id = 0
+popup/item_1/text = "Sopravvivenza"
+popup/item_1/id = 1
+
 [node name="New" type="Button" parent="Center/Column"]
 unique_name_in_owner = true
 layout_mode = 2
