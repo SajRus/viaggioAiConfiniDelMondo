@@ -1,8 +1,8 @@
 # Viaggio ai confini del mondo — Analisi e progettazione
 
-Versione del 15 novembre 2026 · fonte di verità del progetto
+Versione del 21 novembre 2026 · fonte di verità del progetto
 
-L'MVP ha chiuso il gate 4 il 15 novembre 2026. Questa versione aggiunge l'analisi della fase 2, sopravvivenza, divisa nelle sottofasi 5a e 5b.
+L'MVP ha chiuso il gate 4 il 15 novembre 2026 e la sottofase 5a il gate 5a il 21 novembre 2026. Questa versione aggiunge l'analisi della sottofase 5b, il viaggio verso il finale.
 
 ## Visione e scope
 
@@ -52,8 +52,8 @@ La fase 2 si divide in due sottofasi, ognuna con il proprio gate. La 5a porta la
 | --- | --- | --- | --- |
 | RF-20 | Salute, danno da caduta e respawn | Must | 5a |
 | RF-21 | Inventario con quantità: i blocchi rotti entrano in inventario, piazzarli li consuma | Must | 5a |
-| RF-22 | Sconfiggere il Drago dei Confini | Must | 5b |
-| RF-23 | Trovare tutte e 5 le gemme madre | Must | 5b |
+| RF-22 | Sconfiggere il Drago dei Confini | Must | 5b, vedi "Progettazione della sottofase 5b" |
+| RF-23 | Trovare tutte e 7 le gemme madre | Must | 5b |
 | RF-24 | Sconfiggere il portatore di mondi | Must | 5b |
 | RF-25 | Tempo di rottura diverso per tipo di blocco | Should | 5a |
 | RF-26 | Crafting minimo: 3–5 ricette | Should | 5a |
@@ -259,14 +259,95 @@ Nessuno dei requisiti della 5a introduce un rischio tecnico nuovo: mesh, collisi
 - Playtest sul Mac con una checklist di sopravvivenza in `docs/validazione.md`.
 - Gate 5a: RF-20 e RF-21 completi, RF-25 e RF-26 completi o rinviati da Sajmir, test verdi, playtest superato.
 
-## Struttura della sottofase 5b: il viaggio
+## Progettazione della sottofase 5b: il viaggio
 
-La 5b dà al gioco un finale. Questa sezione fissa solo la struttura; mondo, combattimento e boss si progettano nell'analisi della 5b, dopo il gate 5a.
+La 5b dà al gioco un finale: trovare 6 gemme madre nei santuari sotterranei, strappare la settima al Drago dei Confini, posarle tutte sull'altare al bordo del mondo e sconfiggere il portatore di mondi che ne esce.
 
-- Le 5 gemme madre sono nascoste in strutture sotto terra, generate dal seed insieme al terreno. Una la custodisce il Drago dei Confini.
-- Con tutte e 5 le gemme, al bordo del mondo si evoca il portatore di mondi, il boss finale. Sconfiggerlo chiude il gioco.
-- Il combattimento è corpo a corpo e riguarda solo i due boss. I nemici comuni (RF-28) restano fuori.
-- Rischi da studiare con PoC propri: un drago in volo in un mondo voxel di 256 × 256 × 64 blocchi, la generazione delle strutture sotterranee senza rompere RNF-03, il movimento dei boss tra i blocchi.
+### Requisiti della 5b
+
+| ID | Requisito | Priorità |
+| --- | --- | --- |
+| RF-22 | Sconfiggere il Drago dei Confini, che custodisce la settima gemma | Must |
+| RF-23 | Trovare tutte e 7 le gemme madre | Must |
+| RF-24 | Sconfiggere il portatore di mondi | Must |
+| RF-29 | Combattimento corpo a corpo, con spada di legno e spada di pietra | Must |
+| RF-30 | Schermata di vittoria; il salvataggio ricorda il progresso del viaggio | Should |
+
+Il viaggio esiste solo nei mondi creati dopo la 5b: i mondi salvati prima contengono già tutto il terreno e non hanno santuari né altare. Per giocarlo serve un mondo nuovo.
+
+### Il percorso
+
+1. Il mondo ha 6 santuari, disposti in cerchio attorno al centro, a metà strada tra il centro e il bordo e a 60° l'uno dall'altro. Sopra ognuno, in superficie, c'è un obelisco di mattoni di pietra alto 5 blocchi, visibile da lontano; sotto, una scala scende fino a una stanza di 7 × 4 × 7 blocchi, 10–15 blocchi sotto la superficie. Al centro della stanza c'è un blocco gemma: rompendolo si ottiene la gemma.
+2. Lungo un bordo del mondo c'è l'arena del drago: una piattaforma di pietra di 15 × 15 blocchi. Quando il giocatore ci sale, il Drago dei Confini si leva in volo. Sconfitto, lascia la Gemma del Confine.
+3. Lungo il bordo opposto c'è l'Altare dei Confini, con 7 incavi. Clic destro sull'altare con tutte e 7 le gemme nell'inventario: le gemme si posano e il portatore di mondi appare accanto all'altare.
+4. Sconfitto il portatore di mondi, compare la schermata di vittoria con il tempo di gioco. Con Continua si torna nel mondo e si può continuare a costruire.
+
+| Gemma | Colore | Dove |
+| --- | --- | --- |
+| Rubino | Rosso | Santuario a nord |
+| Smeraldo | Verde | Santuario a nord-est |
+| Ossidiana | Nera | Santuario a sud-est |
+| Oro | Giallo | Santuario a sud |
+| Diamante | Azzurro | Santuario a sud-ovest |
+| Ametista | Viola | Santuario a nord-ovest |
+| Gemma del Confine | Argento | Lasciata dal Drago dei Confini |
+
+### Combattimento (RF-29)
+
+- Il clic sinistro su un boss entro 3,5 blocchi lo colpisce invece di rompere blocchi. Un colpo ogni 0,5 s.
+- Danno per colpo: mano 1, piccone 2, spada di legno 3, spada di pietra 5.
+- Nuove ricette: spada di legno da 3 assi, spada di pietra da 1 asse e 2 pietra.
+- I boss colpiscono il giocatore e lo spingono indietro: picchiata del drago 4 punti, carica del gigante 5, blocco scagliato 3. Se il giocatore muore rinasce al punto di partenza e il boss torna a piena salute; la Gemma del Confine e le gemme posate non si perdono.
+- In creativa i boss non compaiono: il viaggio è della sopravvivenza.
+
+### Drago dei Confini (RF-22)
+
+- 60 punti salute. È fatto di cubi colorati, in attesa di un modello vero.
+- Ciclo: vola in cerchio sopra l'arena, scende in picchiata verso il giocatore, resta a terra 3 secondi e riprende il volo. Si può colpire solo mentre è a terra.
+- Vola solo sopra l'arena, che è aperta: non deve evitare blocchi. I blocchi che il giocatore costruisce sull'arena non lo fermano.
+
+### Portatore di mondi (RF-24)
+
+- Un gigante di blocchi alto 4 blocchi, con 120 punti salute.
+- Cammina sul terreno verso il giocatore con la stessa fisica del giocatore. Sale gradini di un blocco; se un muro lo ferma, lo rompe. Così non serve un pathfinding: il portatore di mondi si apre la strada.
+- Vicino al giocatore colpisce a terra. Ogni 6 secondi strappa un blocco dal terreno accanto a sé e lo scaglia verso il giocatore.
+- Rompe al massimo un blocco ogni 0,5 s, per restare entro RNF-04.
+
+### Mondo: terreno versione 3
+
+- I santuari, l'arena e l'altare sono una terza versione del terreno, generata dal seed. Le versioni 1 e 2 restano come sono.
+- Blocchi nuovi, con ID liberi: mattoni di pietra, pietra dell'arena, altare e i 6 blocchi gemma dei santuari. I mattoni di pietra non si rompono a mani nude: chi cerca un santuario scende dalle scale.
+- Le gemme sono oggetti, non blocchi: non si piazzano.
+
+### Salvataggio
+
+Una nuova sezione `TRIP` registra il viaggio: drago sconfitto, gemme posate sull'altare, portatore di mondi sconfitto e tempo di gioco. Le gemme raccolte sono nell'inventario. Lo stato di un combattimento in corso non si salva: ricaricando, il boss ricomincia da capo. Come per `SURV`, il formato resta alla versione 2 e si aggiunge un file d'esempio nei test.
+
+### Texture
+
+Servono i mattoni di pietra, la pietra dell'arena, l'altare, i 6 blocchi gemma, le 7 icone delle gemme e le 2 spade: 18 caselle. L'atlante passa da 4 × 4 a 8 × 8 caselle, cioè 128 × 128 pixel; fino alle immagini di Sajmir si usano segnaposto. I boss sono cubi colorati.
+
+### Rischi e PoC della 5b
+
+| Rischio | Impatto | Mitigazione |
+| --- | --- | --- |
+| Il volo del drago non è giocabile: picchiate che mancano il giocatore, drago che resta incastrato o non torna in volo | Alto | PoC 5 |
+| Il portatore di mondi si blocca tra colline e alberi, o rompendo blocchi supera RNF-04 | Alto | PoC 6 |
+| Santuari, arena e altare rallentano la generazione oltre RNF-03 | Basso | Stessa tecnica degli alberi; misura nei test |
+| Colpire un boss e rompere un blocco con lo stesso clic si confondono | Medio | Il boss ha la precedenza se è più vicino del blocco mirato; test di integrazione |
+
+| PoC | Cosa dimostra | Criterio di successo |
+| --- | --- | --- |
+| PoC 5: drago in volo | Ciclo volo, picchiata, atterraggio e decollo sopra un'arena; colpi del giocatore solo a terra | 50 cicli di fila senza blocchi; il drago si sconfigge in un combattimento di prova; 60 FPS |
+| PoC 6: gigante tra i blocchi | Inseguimento sul terreno con alberi, salita dei gradini, muri rotti | Raggiunge il giocatore da 100 blocchi di distanza su 10 seed senza bloccarsi; ogni blocco rotto entro RNF-04 |
+
+### Test e gate 5b
+
+- Unit test: danni e ricette delle spade, stati del drago e del gigante, generazione di santuari, arena e altare, sezione `TRIP`.
+- Test di integrazione: un colpo al boss non rompe blocchi; posare le 7 gemme evoca il portatore di mondi; la vittoria si salva.
+- Misura delle prestazioni durante i due combattimenti: 60 FPS a 1080p.
+- Playtest sul Mac: il viaggio completo, dalle gemme alla vittoria, con salvataggi a metà.
+- Gate 5b: RF-22, RF-23, RF-24 e RF-29 completi, test verdi, viaggio completo nel playtest.
 
 ## Piano SDLC
 
@@ -279,7 +360,7 @@ Il lavoro procede in cinque fasi, l'ultima divisa in due sottofasi, ognuna chius
 | 3. Sviluppo MVP | Requisiti Must e Should, con unit test | Gate 3: Must completati, test verdi |
 | 4. Validazione e QA | Test, prestazioni, playtest, export | Gate 4: zero bug bloccanti, RNF rispettati |
 | 5a. Sopravvivenza | Analisi, sviluppo, QA di RF-20, 21, 25 e 26 | Gate 5a: Must completati, test verdi, playtest superato |
-| 5b. Il viaggio | Analisi, PoC, sviluppo, QA di RF-22, 23 e 24 | Gate 5b: definito nell'analisi della 5b |
+| 5b. Il viaggio | Analisi, PoC 5 e 6, sviluppo, QA di RF-22, 23, 24, 29 e 30 | Gate 5b: RF-22, 23, 24 e 29 completi, test verdi, viaggio completo nel playtest |
 
 Se un gate non passa si torna alla fase precedente: un PoC fallito cambia il design, non si aggira dentro l'MVP.
 
