@@ -102,6 +102,8 @@ Lo strumento ora disegna la scena sempre a 1920 × 1080, anche se macOS ridimens
 
 ## Playtest della sottofase 5a
 
+**Gate 5a approvato da Sajmir il 21 novembre 2026.**
+
 Sulla build esportata, con un nuovo mondo in sopravvivenza.
 
 - [x] Il menu propone Creativa e Sopravvivenza; un mondo creativo funziona come prima
