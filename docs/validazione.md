@@ -121,6 +121,18 @@ Sulla build esportata, con un nuovo mondo in sopravvivenza.
 - [x] Esc, Salva, Menu principale, Carica: salute e inventario sono quelli salvati
 - [x] Il salvataggio di prima della 5a si carica ancora, come mondo creativo
 
+## PoC della sottofase 5b
+
+**Gate dei PoC della 5b approvato da Sajmir il 25 novembre 2026.** Misure su Apple M1, build di debug dell'editor; tabelle e comandi nei README dei PoC.
+
+| PoC | Criterio | Esito |
+| --- | --- | --- |
+| PoC 5: drago in volo | 50 cicli di fila senza blocchi | 50 cicli su 10 seed, nessun blocco |
+| | Il drago si sconfigge in un combattimento di prova | 20,9 s con la spada di pietra, 113,1 s a mani nude |
+| | 60 FPS | Con vsync, 60 FPS; senza vsync mediana 3,2 ms e 95° percentile 8,1 ms |
+| PoC 6: gigante tra i blocchi | Raggiunge il giocatore da 100 blocchi su 10 seed senza bloccarsi | 20 percorsi su 20: 10 in campo aperto, 10 con il giocatore dentro un recinto di pietra |
+| | Ogni blocco rotto entro RNF-04 | In finestra a 1080p mediana 13–16,4 ms, massimo 25 ms e una volta 34 ms. Accettato sulla mediana, come al gate 4 |
+
 ## Export macOS
 
 Il preset è in `export_presets.cfg`: binario universale, firma ad-hoc, senza notarizzazione. Esclude `tools/`, `test/`, `poc/`, `docs/` e `addons/`. Servono i template di export della 4.7 (Editor → Manage Export Templates → Download and Install). Per esportare l'architettura arm64 la 4.7 richiede l'importazione delle texture ETC2/ASTC, attiva in `project.godot`.
