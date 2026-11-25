@@ -1,8 +1,8 @@
 # Viaggio ai confini del mondo — Analisi e progettazione
 
-Versione del 21 novembre 2026 · fonte di verità del progetto
+Versione del 25 novembre 2026 · fonte di verità del progetto
 
-L'MVP ha chiuso il gate 4 il 15 novembre 2026 e la sottofase 5a il gate 5a il 21 novembre 2026. Questa versione aggiunge l'analisi della sottofase 5b, il viaggio verso il finale.
+L'MVP ha chiuso il gate 4 il 15 novembre 2026 e la sottofase 5a il gate 5a il 21 novembre 2026. La sottofase 5b, il viaggio verso il finale, ha superato i PoC il 25 novembre 2026 ed è in sviluppo.
 
 ## Visione e scope
 
@@ -336,10 +336,12 @@ Servono i mattoni di pietra, la pietra dell'arena, l'altare, i 6 blocchi gemma, 
 | Santuari, arena e altare rallentano la generazione oltre RNF-03 | Basso | Stessa tecnica degli alberi; misura nei test |
 | Colpire un boss e rompere un blocco con lo stesso clic si confondono | Medio | Il boss ha la precedenza se è più vicino del blocco mirato; test di integrazione |
 
-| PoC | Cosa dimostra | Criterio di successo |
-| --- | --- | --- |
-| PoC 5: drago in volo | Ciclo volo, picchiata, atterraggio e decollo sopra un'arena; colpi del giocatore solo a terra | 50 cicli di fila senza blocchi; il drago si sconfigge in un combattimento di prova; 60 FPS |
-| PoC 6: gigante tra i blocchi | Inseguimento sul terreno con alberi, salita dei gradini, muri rotti | Raggiunge il giocatore da 100 blocchi di distanza su 10 seed senza bloccarsi; ogni blocco rotto entro RNF-04 |
+| PoC | Cosa dimostra | Criterio di successo | Esito |
+| --- | --- | --- | --- |
+| PoC 5: drago in volo | Ciclo volo, picchiata, atterraggio e decollo sopra un'arena; colpi del giocatore solo a terra | 50 cicli di fila senza blocchi; il drago si sconfigge in un combattimento di prova; 60 FPS | Superato |
+| PoC 6: gigante tra i blocchi | Inseguimento sul terreno con alberi, salita dei gradini, muri rotti | Raggiunge il giocatore da 100 blocchi di distanza su 10 seed senza bloccarsi; ogni blocco rotto entro RNF-04 | Superato; RNF-04 sulla mediana, come al gate 4 |
+
+**Gate dei PoC della 5b approvato da Sajmir il 25 novembre 2026.** I due PoC non cambiano il design. Misure e comandi sono nei README di `poc/poc5_dragon` e `poc/poc6_giant` e in [validazione.md](validazione.md).
 
 ### Test e gate 5b
 
