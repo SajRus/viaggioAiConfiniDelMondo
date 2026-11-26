@@ -54,7 +54,7 @@ func start_generation(
 	_saved_blocks = saved_blocks if saved_blocks.size() == volume else PackedByteArray()
 	_saved_diffs = saved_diffs
 	manager = ChunkManager.new(data, _mesher, _nodes)
-	_generator = TerrainGenerator.new(world_seed, terrain_version)
+	_generator = TerrainGenerator.new(world_seed, terrain_version, chunks_per_side * ChunkData.SIZE_X)
 	_add_border_walls()
 	_next_chunk = 0
 	_phase = Phase.GENERATING

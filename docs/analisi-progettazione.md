@@ -316,6 +316,11 @@ Il viaggio esiste solo nei mondi creati dopo la 5b: i mondi salvati prima conten
 ### Mondo: terreno versione 3
 
 - I santuari, l'arena e l'altare sono una terza versione del terreno, generata dal seed. Le versioni 1 e 2 restano come sono.
+- Come per gli alberi, ogni chunk disegna le parti delle costruzioni che lo toccano. Le costruzioni si disegnano dopo gli alberi e li sostituiscono dove si sovrappongono. Le posizioni dipendono dalla dimensione del mondo; il nord è −Z e l'est è +X.
+- Santuario: la stanza ha pareti, pavimento e soffitto di mattoni di pietra. Il pavimento sta 10–15 blocchi sotto la superficie al centro del santuario, secondo il seed, e mai sotto lo strato 2. Il blocco gemma è al centro, sul pavimento. Una porta nella parete est apre una scala larga 1 e alta 4 che sale verso est di un blocco per colonna, finché sbuca in superficie. I gradini sono di mattoni di pietra, come le pareti e il soffitto della scala dove sono sotto terra. L'obelisco sta sulla superficie, sopra il centro della stanza.
+- L'arena del drago sta sul bordo est, centrata sull'asse nord-sud, a 4 blocchi dal bordo. L'altare sta sul bordo ovest, nella stessa posizione. Est e ovest sono le due direzioni senza santuario.
+- La piattaforma dell'arena è di pietra dell'arena, all'altezza media del terreno su cui poggia, e sopra l'aria è libera fino al cielo, alberi compresi. Nei 10 blocchi attorno il terreno sale o scende gradualmente fino all'altezza della piattaforma, così ci si arriva a piedi: senza raccordo, su 20 seed, il dislivello al bordo arrivava a 11 blocchi.
+- L'altare è una piattaforma di mattoni di pietra di 7 × 7 blocchi, costruita come l'arena e con lo stesso raccordo, con il blocco altare al centro.
 - Blocchi nuovi, con ID liberi: mattoni di pietra, pietra dell'arena, altare e i 6 blocchi gemma dei santuari. I mattoni di pietra non si rompono a mani nude: chi cerca un santuario scende dalle scale.
 - Le gemme sono oggetti, non blocchi: non si piazzano. Hanno ID dopo quelli degli strumenti.
 
