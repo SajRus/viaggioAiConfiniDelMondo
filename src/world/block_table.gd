@@ -12,8 +12,19 @@ const LOG: int = 5
 const LEAVES: int = 6
 const PLANKS: int = 7
 const GLASS: int = 8
+const STONE_BRICKS: int = 9
+const ARENA_STONE: int = 10
+const ALTAR: int = 11
+## The six gem blocks of the shrines, from the ruby to the amethyst.
+const GEM_RUBY: int = 12
+const GEM_EMERALD: int = 13
+const GEM_OBSIDIAN: int = 14
+const GEM_GOLD: int = 15
+const GEM_DIAMOND: int = 16
+const GEM_AMETHYST: int = 17
+const LAST_BLOCK: int = GEM_AMETHYST
 
-const ATLAS_COLUMN_BITS: int = 2
+const ATLAS_COLUMN_BITS: int = 3
 const ATLAS_COLUMNS: int = 1 << ATLAS_COLUMN_BITS
 const ATLAS_TILE_PIXELS: int = 16
 const ATLAS_TILE_UV: float = 1.0 / ATLAS_COLUMNS
@@ -28,6 +39,10 @@ const TILE_LOG_SIDE: int = 6
 const TILE_LEAVES: int = 7
 const TILE_PLANKS: int = 8
 const TILE_GLASS: int = 9
+const TILE_STONE_BRICKS: int = 16
+const TILE_ARENA_STONE: int = 17
+const TILE_ALTAR: int = 18
+const TILE_GEM_RUBY: int = 19
 
 const MAX_TYPES: int = 256
 
@@ -52,6 +67,12 @@ func _init() -> void:
 	_define(LEAVES, TILE_LEAVES, TILE_LEAVES, TILE_LEAVES, true)
 	_define(PLANKS, TILE_PLANKS, TILE_PLANKS, TILE_PLANKS, false)
 	_define(GLASS, TILE_GLASS, TILE_GLASS, TILE_GLASS, true)
+	_define(STONE_BRICKS, TILE_STONE_BRICKS, TILE_STONE_BRICKS, TILE_STONE_BRICKS, false)
+	_define(ARENA_STONE, TILE_ARENA_STONE, TILE_ARENA_STONE, TILE_ARENA_STONE, false)
+	_define(ALTAR, TILE_ALTAR, TILE_ALTAR, TILE_ALTAR, false)
+	for id: int in range(GEM_RUBY, GEM_AMETHYST + 1):
+		var tile: int = TILE_GEM_RUBY + id - GEM_RUBY
+		_define(id, tile, tile, tile, false)
 
 
 static func tile_uv_origin(tile: int) -> Vector2:
