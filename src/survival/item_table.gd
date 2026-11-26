@@ -15,11 +15,15 @@ const GOLD: int = 261
 const DIAMOND: int = 262
 const AMETHYST: int = 263
 const BORDER_GEM: int = 264
+const WOODEN_SWORD: int = 265
+const STONE_SWORD: int = 266
 const MAX_STACK: int = 64
 
 const TILE_WOODEN_PICKAXE: int = 14
 const TILE_STONE_PICKAXE: int = 15
 const TILE_RUBY: int = 25
+const TILE_WOODEN_SWORD: int = 32
+const TILE_STONE_SWORD: int = 33
 
 const HAND_FAST_SECONDS: float = 0.3
 const HAND_SOFT_SECONDS: float = 0.6
@@ -37,7 +41,7 @@ static func is_block(item: int) -> bool:
 
 
 static func is_tool_item(item: int) -> bool:
-	return item == WOODEN_PICKAXE or item == STONE_PICKAXE
+	return item == WOODEN_PICKAXE or item == STONE_PICKAXE or item == WOODEN_SWORD or item == STONE_SWORD
 
 
 static func is_gem(item: int) -> bool:
@@ -95,6 +99,10 @@ static func icon_tile(item: int) -> int:
 		return TILE_STONE_PICKAXE
 	if item == WOODEN_PICKAXE:
 		return TILE_WOODEN_PICKAXE
+	if item == WOODEN_SWORD:
+		return TILE_WOODEN_SWORD
+	if item == STONE_SWORD:
+		return TILE_STONE_SWORD
 	return BlockRegistry.tile_side[item]
 
 
@@ -138,6 +146,10 @@ static func display_name(item: int) -> String:
 			return "Piccone di legno"
 		STONE_PICKAXE:
 			return "Piccone di pietra"
+		WOODEN_SWORD:
+			return "Spada di legno"
+		STONE_SWORD:
+			return "Spada di pietra"
 		RUBY:
 			return "Rubino"
 		EMERALD:

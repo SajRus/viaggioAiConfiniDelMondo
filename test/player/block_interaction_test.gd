@@ -80,3 +80,54 @@ func test_interaction_before_setup_does_nothing() -> void:
 
 	assert_bool(interaction.break_target()).is_false()
 	assert_bool(interaction.place_target()).is_false()
+
+
+## A training boss [param distance] blocks along the view from the camera.
+func _boss_along_view(distance: float) -> TrainingBoss:
+	var camera: Camera3D = _player.get_node("Head/Camera")
+	var boss: TrainingBoss = auto_free(TrainingBoss.new())
+	boss.size = Vector3.ONE * 0.4
+	add_child(boss)
+	boss.global_position = camera.global_position - camera.global_basis.z * distance
+	return boss
+
+
+func _hold_primary(seconds: float) -> int:
+	var dealt: int = 0
+	for _tick: int in roundi(seconds * 60.0):
+		_interaction.combat.update(1.0 / 60.0)
+		dealt += _interaction.hold_primary(1.0 / 60.0)
+	return dealt
+
+
+func test_a_blow_at_a_boss_breaks_no_block() -> void:
+	_interaction.inventory = Inventory.new()
+	await _look(-1.2)
+	_interaction.update_target()
+	var block: Vector3i = _interaction.target.block
+	var boss: TrainingBoss = _boss_along_view(_interaction.target.distance * 0.5)
+
+	var dealt: int = _hold_primary(5.0)
+
+	assert_int(_world.get_block_world(block.x, block.y, block.z)).is_equal(BlockTable.STONE)
+	# One blow at once, then one every half second.
+	assert_int(boss.blows).is_equal(10)
+	assert_int(dealt).is_equal(10)
+
+
+func test_a_block_closer_than_the_boss_is_broken_instead() -> void:
+	_interaction.inventory = Inventory.new()
+	_interaction.inventory.add(ItemTable.STONE_PICKAXE, 1)
+	await _look(-1.2)
+	_interaction.update_target()
+	var block: Vector3i = _interaction.target.block
+	var boss: TrainingBoss = _boss_along_view(_interaction.target.distance + 0.5)
+	boss.size = Vector3.ONE * 0.2
+
+	var ticks: int = 0
+	while _world.get_block_world(block.x, block.y, block.z) != BlockTable.AIR and ticks < 120:
+		_hold_primary(1.0 / 60.0)
+		ticks += 1
+
+	assert_int(_world.get_block_world(block.x, block.y, block.z)).is_equal(BlockTable.AIR)
+	assert_int(boss.blows).is_equal(0)
