@@ -317,7 +317,18 @@ Il viaggio esiste solo nei mondi creati dopo la 5b: i mondi salvati prima conten
 
 - I santuari, l'arena e l'altare sono una terza versione del terreno, generata dal seed. Le versioni 1 e 2 restano come sono.
 - Blocchi nuovi, con ID liberi: mattoni di pietra, pietra dell'arena, altare e i 6 blocchi gemma dei santuari. I mattoni di pietra non si rompono a mani nude: chi cerca un santuario scende dalle scale.
-- Le gemme sono oggetti, non blocchi: non si piazzano.
+- Le gemme sono oggetti, non blocchi: non si piazzano. Hanno ID dopo quelli degli strumenti.
+
+| Blocco | ID | Mani nude | Piccone di legno | Piccone di pietra | Dà |
+| --- | --- | --- | --- | --- | --- |
+| Mattoni di pietra | 9 | Non si rompe | 1,5 s | 0,8 s | Mattoni di pietra |
+| Pietra dell'arena | 10 | 4,0 s | 1,5 s | 0,8 s | Pietra dell'arena |
+| Altare | 11 | Non si rompe | Non si rompe | Non si rompe | Nulla |
+| Blocchi gemma, dal rubino all'ametista | 12–17 | 1,5 s | 1,5 s | 1,5 s | La gemma |
+
+- In sopravvivenza l'altare non si rompe, così il viaggio non si perde. In creativa si rompe come ogni blocco.
+- Gemme: Rubino 258, Smeraldo 259, Ossidiana 260, Oro 261, Diamante 262, Ametista 263, Gemma del Confine 264. Si impilano come i blocchi.
+- La hotbar della creativa resta con gli 8 blocchi dell'MVP.
 
 ### Salvataggio
 
@@ -325,7 +336,7 @@ Una nuova sezione `TRIP` registra il viaggio: drago sconfitto, gemme posate sull
 
 ### Texture
 
-Servono i mattoni di pietra, la pietra dell'arena, l'altare, i 6 blocchi gemma, le 7 icone delle gemme e le 2 spade: 18 caselle. L'atlante passa da 4 × 4 a 8 × 8 caselle, cioè 128 × 128 pixel; fino alle immagini di Sajmir si usano segnaposto. I boss sono cubi colorati.
+Servono i mattoni di pietra, la pietra dell'arena, l'altare, i 6 blocchi gemma, le 7 icone delle gemme e le 2 spade: 18 caselle. L'atlante passa da 4 × 4 a 8 × 8 caselle, cioè 128 × 128 pixel; fino alle immagini di Sajmir si usano segnaposto. Le 16 caselle esistenti tengono il loro numero e occupano le prime due righe; seguono mattoni di pietra (16), pietra dell'arena (17), altare (18), i 6 blocchi gemma (19–24), le 7 gemme (25–31), spada di legno (32) e spada di pietra (33). I boss sono cubi colorati.
 
 ### Rischi e PoC della 5b
 
