@@ -294,9 +294,11 @@ Il viaggio esiste solo nei mondi creati dopo la 5b: i mondi salvati prima conten
 
 ### Combattimento (RF-29)
 
-- Il clic sinistro su un boss entro 3,5 blocchi lo colpisce invece di rompere blocchi. Un colpo ogni 0,5 s.
-- Danno per colpo: mano 1, piccone 2, spada di legno 3, spada di pietra 5.
+- Il clic sinistro su un boss entro 3,5 blocchi lo colpisce invece di rompere blocchi. Un colpo ogni 0,5 s: tenendo premuto il tasto si continua a colpire. Se il mirino prende anche un blocco, il boss ha la precedenza quando è più vicino del blocco.
+- Danno per colpo: mano 1, piccone 2, spada di legno 3, spada di pietra 5. Un blocco o una gemma in mano colpisce come la mano.
 - Nuove ricette: spada di legno da 3 assi, spada di pietra da 1 asse e 2 pietra.
+- Le spade sono strumenti con ID 265 (legno) e 266 (pietra): non si impilano e non si piazzano. Per rompere i blocchi valgono come la mano.
+- Un boss è un nodo che dichiara la sua scatola da colpire, se in quel momento si può colpire e quanti danni subisce. Il drago e il portatore di mondi lo estendono.
 - I boss colpiscono il giocatore e lo spingono indietro: picchiata del drago 4 punti, carica del gigante 5, blocco scagliato 3. Se il giocatore muore rinasce al punto di partenza e il boss torna a piena salute; la Gemma del Confine e le gemme posate non si perdono.
 - In creativa i boss non compaiono: il viaggio è della sopravvivenza.
 

@@ -8,8 +8,30 @@ func _recipe(output: int) -> Recipe:
 	return null
 
 
-func test_there_are_four_recipes() -> void:
-	assert_int(Recipe.all().size()).is_equal(4)
+func test_there_are_six_recipes() -> void:
+	assert_int(Recipe.all().size()).is_equal(6)
+
+
+func test_three_planks_make_a_wooden_sword() -> void:
+	var inventory: Inventory = Inventory.new()
+	inventory.add(BlockTable.PLANKS, 3)
+
+	assert_bool(_recipe(ItemTable.WOODEN_SWORD).craft(inventory)).is_true()
+
+	assert_int(inventory.count_of(ItemTable.WOODEN_SWORD)).is_equal(1)
+	assert_int(inventory.count_of(BlockTable.PLANKS)).is_equal(0)
+
+
+func test_stone_sword_uses_one_plank_and_two_stone() -> void:
+	var inventory: Inventory = Inventory.new()
+	inventory.add(BlockTable.PLANKS, 1)
+	inventory.add(BlockTable.STONE, 2)
+
+	assert_bool(_recipe(ItemTable.STONE_SWORD).craft(inventory)).is_true()
+
+	assert_int(inventory.count_of(ItemTable.STONE_SWORD)).is_equal(1)
+	assert_int(inventory.count_of(BlockTable.PLANKS)).is_equal(0)
+	assert_int(inventory.count_of(BlockTable.STONE)).is_equal(0)
 
 
 func test_one_log_makes_four_planks() -> void:

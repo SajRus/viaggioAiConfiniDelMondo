@@ -11,6 +11,8 @@ func test_item_ids_never_change() -> void:
 		ItemTable.DIAMOND, ItemTable.AMETHYST, ItemTable.BORDER_GEM,
 	]
 	assert_array(gems).is_equal([258, 259, 260, 261, 262, 263, 264] as Array[int])
+	assert_int(ItemTable.WOODEN_SWORD).is_equal(265)
+	assert_int(ItemTable.STONE_SWORD).is_equal(266)
 
 
 func test_blocks_and_tools_are_items() -> void:
@@ -22,7 +24,7 @@ func test_blocks_and_tools_are_items() -> void:
 	assert_bool(ItemTable.is_block(BlockTable.LAST_BLOCK + 1)).is_false()
 	assert_bool(ItemTable.is_known_item(BlockTable.LAST_BLOCK + 1)).is_false()
 	assert_bool(ItemTable.is_known_item(ItemTable.BORDER_GEM)).is_true()
-	assert_bool(ItemTable.is_known_item(ItemTable.BORDER_GEM + 1)).is_false()
+	assert_bool(ItemTable.is_known_item(ItemTable.STONE_SWORD + 1)).is_false()
 
 
 func test_gems_are_not_blocks_and_stack() -> void:
@@ -35,6 +37,15 @@ func test_gems_are_not_blocks_and_stack() -> void:
 func test_tools_do_not_stack() -> void:
 	assert_int(ItemTable.stack_limit(ItemTable.STONE_PICKAXE)).is_equal(1)
 	assert_int(ItemTable.stack_limit(BlockTable.STONE)).is_equal(64)
+	assert_int(ItemTable.stack_limit(ItemTable.WOODEN_SWORD)).is_equal(1)
+	assert_bool(ItemTable.is_block(ItemTable.STONE_SWORD)).is_false()
+	assert_bool(ItemTable.is_known_item(ItemTable.STONE_SWORD)).is_true()
+
+
+func test_swords_break_blocks_like_the_hand() -> void:
+	assert_float(ItemTable.break_seconds(BlockTable.STONE, ItemTable.STONE_SWORD)).is_equal(4.0)
+	assert_float(ItemTable.break_seconds(BlockTable.STONE_BRICKS, ItemTable.WOODEN_SWORD)).is_equal(ItemTable.UNBREAKABLE)
+	assert_float(ItemTable.break_seconds(BlockTable.LOG, ItemTable.WOODEN_SWORD)).is_equal(1.5)
 
 
 func test_grass_drops_dirt_and_leaves_and_glass_drop_nothing() -> void:
@@ -88,6 +99,8 @@ func test_icon_tiles() -> void:
 	assert_int(ItemTable.icon_tile(ItemTable.STONE_PICKAXE)).is_equal(ItemTable.TILE_STONE_PICKAXE)
 	assert_int(ItemTable.icon_tile(ItemTable.RUBY)).is_equal(ItemTable.TILE_RUBY)
 	assert_int(ItemTable.icon_tile(ItemTable.BORDER_GEM)).is_equal(ItemTable.TILE_RUBY + 6)
+	assert_int(ItemTable.icon_tile(ItemTable.WOODEN_SWORD)).is_equal(ItemTable.TILE_WOODEN_SWORD)
+	assert_int(ItemTable.icon_tile(ItemTable.STONE_SWORD)).is_equal(ItemTable.TILE_STONE_SWORD)
 
 
 func test_every_item_has_a_name() -> void:
@@ -96,5 +109,5 @@ func test_every_item_has_a_name() -> void:
 	assert_str(ItemTable.display_name(ItemTable.STONE_PICKAXE)).is_equal("Piccone di pietra")
 	for item: int in range(BlockTable.GRASS, BlockTable.LAST_BLOCK + 1):
 		assert_str(ItemTable.display_name(item)).is_not_empty()
-	for item: int in range(ItemTable.RUBY, ItemTable.BORDER_GEM + 1):
+	for item: int in range(ItemTable.RUBY, ItemTable.STONE_SWORD + 1):
 		assert_str(ItemTable.display_name(item)).is_not_empty()

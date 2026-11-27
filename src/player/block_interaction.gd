@@ -10,6 +10,7 @@ const TILE_CRACK_FIRST: int = 10
 @export var atlas: Texture2D
 
 var hotbar: Hotbar = Hotbar.new()
+var combat: Combat = Combat.new()
 ## Set in survival: blocks come from here and broken blocks go here.
 var inventory: Inventory = null
 var target: VoxelHit = null
@@ -34,8 +35,9 @@ func _process(delta: float) -> void:
 	update_target()
 	if inventory == null:
 		return
+	combat.update(delta)
 	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-		hold_break(delta)
+		hold_primary(delta)
 	else:
 		release_break()
 
@@ -78,6 +80,32 @@ func selected_item() -> int:
 func break_target() -> bool:
 	update_target()
 	return _manager != null and BlockEditor.break_block(_manager, target)
+
+
+## Survival: one frame of holding the left button. Strikes the aimed boss,
+## or works on breaking the targeted block. Returns the damage dealt.
+func hold_primary(delta: float) -> int:
+	update_target()
+	var boss: Boss = aimed_boss()
+	if boss == null:
+		hold_break(delta)
+		return 0
+	release_break()
+	return combat.swing(boss, selected_item())
+
+
+## The boss along the view within reach, unless a block stands closer.
+func aimed_boss() -> Boss:
+	var bosses: Array[Boss] = []
+	for node: Node in get_tree().get_nodes_in_group(Boss.GROUP):
+		bosses.append(node as Boss)
+	var boss: Boss = Combat.aimed_boss(_camera.global_position, -_camera.global_basis.z, bosses)
+	if boss == null:
+		return null
+	var distance: float = Combat.distance_to(_camera.global_position, -_camera.global_basis.z, boss)
+	if target != null and target.distance < distance:
+		return null
+	return boss
 
 
 ## Survival: one frame of holding the button. Breaks the target, and collects

@@ -16,13 +16,16 @@ func _init(
 	output_count = result_count
 
 
-## The four recipes of RF-26, in the order the inventory screen lists them.
+## The four recipes of RF-26 and the two swords of RF-29, in the order the
+## inventory screen lists them.
 static func all() -> Array[Recipe]:
 	var recipes: Array[Recipe] = [
 		Recipe.new([BlockTable.LOG], [1], BlockTable.PLANKS, 4),
 		Recipe.new([BlockTable.SAND], [4], BlockTable.GLASS, 1),
 		Recipe.new([BlockTable.PLANKS], [5], ItemTable.WOODEN_PICKAXE, 1),
 		Recipe.new([BlockTable.PLANKS, BlockTable.STONE], [2, 3], ItemTable.STONE_PICKAXE, 1),
+		Recipe.new([BlockTable.PLANKS], [3], ItemTable.WOODEN_SWORD, 1),
+		Recipe.new([BlockTable.PLANKS, BlockTable.STONE], [1, 2], ItemTable.STONE_SWORD, 1),
 	]
 	return recipes
 
